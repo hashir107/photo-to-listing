@@ -1,0 +1,20 @@
+{
+  "name": "photo-to-listing-local",
+  "interface": {
+    "displayName": "photo-to-listing (local)"
+  },
+  "plugins": [
+    {
+      "name": "photo-to-listing",
+      "source": {
+        "source": "local",
+        "path": "./plugins/photo-to-listing"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

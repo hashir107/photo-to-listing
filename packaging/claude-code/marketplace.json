@@ -1,0 +1,15 @@
+{
+  "name": "photo-to-listing-local",
+  "owner": {
+    "name": "hashir107"
+  },
+  "description": "Local marketplace shipped inside the photo-to-listing release package.",
+  "plugins": [
+    {
+      "name": "photo-to-listing",
+      "source": "./plugins/photo-to-listing",
+      "description": "ReLoop skill: photos to resale metadata and German/English listing copy.",
+      "category": "productivity"
+    }
+  ]
+}

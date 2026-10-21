@@ -1,0 +1,29 @@
+# Build output (release ZIPs are attached to CI runs, not committed)
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Never commit personal photos, secrets or local test material
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.heif
+*.webp
+*.mov
+*.mp4
+.env
+*.pem
+*.key
+local-photos/
