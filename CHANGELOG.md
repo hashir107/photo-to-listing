@@ -4,6 +4,33 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-10-21
+
+### Added
+- **Price suggestions**, which is a deliberate scope change: v0.1.0 and v0.2.0 excluded pricing.
+  A new required `price_estimate` field holds the range, suggested value, scope
+  (single item / per unit / lot), optional lot total, `basis` and assumptions.
+  Three bases, in order of preference, are described in `references/pricing.md`:
+  - prices the user pasted from comparable listings,
+  - a cited current new price minus documented depreciation bands,
+  - a labelled "ungeprüft (Modellwissen)" fallback range.
+
+  ReLoop never fetches or scrapes Kleinanzeigen or eBay pages.
+- Validator rules: `low <= suggested <= high`; the basis must match its evidence (a cited
+  URL, a user statement or a tentative inference); no price while the item type is unknown.
+- New fixture `price-from-comparables`, plus price tests (59 tests in total).
+
+### Changed
+- Section B is a single table: Titel, Kategorie, Eigenschaften und Versand, Beschreibung,
+  Preis (Vorschlag), Title (EN), Description (EN). The title and description are inside
+  the table, with `<br>` line breaks. The Gebot/Gesuch, Bilder and Ort/Name rows are removed.
+- Photo cleanup hints, such as covering a serial number, moved to one "Hinweis zu Fotos"
+  line under section A.
+- Schema 0.3.0.
+- Validation and test runs showed two problems, now fixed. A `model_knowledge` price may now cite pages that
+  show no current new price, and `pricing.md` requires any lot total shown in the
+  table to match `lot_total_suggested`.
+
 ## [0.2.0] - 2026-10-21
 
 ### Changed

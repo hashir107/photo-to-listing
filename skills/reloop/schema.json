@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.2.0",
+  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.3.0",
   "title": "ReLoop listing metadata",
   "description": "Structured re-commerce metadata and Kleinanzeigen-style listing copy derived from user-supplied photos and notes. Unknown scalar values are null. For the assessable lists (visible_defects, included_accessories, missing_accessories), null means not assessed and [] means assessed with nothing found or confirmed. See references/extraction-rules.md.",
   "type": "object",
@@ -28,6 +28,7 @@
     "evidence",
     "unknowns",
     "clarification_questions",
+    "price_estimate",
     "listing_language",
     "listing_title",
     "listing_description",
@@ -36,7 +37,7 @@
   "properties": {
     "schema_version": {
       "description": "Version of this schema the document conforms to.",
-      "const": "0.2.0"
+      "const": "0.3.0"
     },
     "revision": {
       "description": "Starts at 1 and increments with each update in the same conversation.",
@@ -179,6 +180,77 @@
       "maxItems": 3,
       "items": {
         "$ref": "#/$defs/question"
+      }
+    },
+    "price_estimate": {
+      "description": "Suggested price for the Kleinanzeigen 'Preis' field with its basis; null when no responsible suggestion is possible. See references/pricing.md.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "currency",
+        "scope",
+        "low",
+        "high",
+        "suggested",
+        "lot_total_suggested",
+        "basis",
+        "assumptions",
+        "evidence_refs"
+      ],
+      "properties": {
+        "currency": {
+          "const": "EUR"
+        },
+        "scope": {
+          "description": "single_item: one item. per_unit: price for each unit. lot: price for everything together.",
+          "enum": [
+            "single_item",
+            "per_unit",
+            "lot"
+          ]
+        },
+        "low": {
+          "type": "number",
+          "minimum": 0
+        },
+        "high": {
+          "type": "number",
+          "minimum": 0
+        },
+        "suggested": {
+          "type": "number",
+          "minimum": 0
+        },
+        "lot_total_suggested": {
+          "description": "Total for all units sold together, after the stated bulk discount; null if not applicable.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "basis": {
+          "description": "user_comparables: prices the user pasted. reference_new_price: cited current new price minus depreciation. model_knowledge: unverified fallback range.",
+          "enum": [
+            "user_comparables",
+            "reference_new_price",
+            "model_knowledge"
+          ]
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/evidence_refs"
+        }
       }
     },
     "listing_language": {

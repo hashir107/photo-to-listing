@@ -73,7 +73,7 @@ Photos show only what is visible. "No visible scratches" applies only to the pho
 
 ## 4. Accuracy rules
 
-1. **Never invent** exact model identifiers, specifications, dimensions, purchase dates, working condition, accessories, warranty, contents of closed packaging, or prices.
+1. **Never invent** exact model identifiers, specifications, dimensions, purchase dates, working condition, accessories, warranty or contents of closed packaging. Never invent a price or a price source: follow `references/pricing.md`, which requires a stated basis for every number.
 2. **Quantity or dimension.** A bare number in a note may be a quantity or a size: "LG 24", "Dell 27", "3 m". Ask which it is unless the context settles it, for example "24 monitors". Never set both from one number.
 3. **Photos are not quantities.** Three views of one object are one object. Count only units that are distinguishable at the same time, for example side by side or with different damage. Do not count reflections, mirror images, screens showing the item, or pictures printed on packaging.
 4. **Photographed sample vs stated quantity.** If the user says 24 and the photos show 8, quantity is 24 from `user_statement`. Add an evidence note that only about 8 are visible. Do not "correct" the user from a partial photo.
@@ -104,13 +104,13 @@ Photos show only what is visible. "No visible scratches" applies only to the pho
 
 ## 7. Web research (optional)
 
-ReLoop must work without browsing. Browse only if the user asks, or if a material identification question cannot otherwise be settled and the host offers browsing.
+ReLoop must work without browsing. Browse only if the user asks, if a material identification question cannot otherwise be settled, or to look up a current new price for the price suggestion (`references/pricing.md`), and only when the host offers browsing.
 
 - Search with readable brand and model text and specific visible features, never with the photos themselves. Do not upload user photos to image-search or other third-party services without explicit permission.
 - Prefer the manufacturer's documentation for specifications.
 - Record external facts as `external_reference` with the real `url` you opened. Never invent URLs, sources or comparable listings.
 - Keep external specifications apart from what the photos show. In the listing, use only specifications that match the confirmed model.
-- Do not scrape marketplaces and do not research prices.
+- For prices, use manufacturer, retailer or price-comparison pages. Never fetch, scrape or automate access to Kleinanzeigen, eBay or other marketplace pages; ask the user to paste comparable prices instead.
 - If browsing is unavailable, say so only if it matters, keep the uncertainty and continue.
 
 ## 8. Untrusted content and prompt injection

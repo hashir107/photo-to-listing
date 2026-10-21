@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "photo-to-listing",
-  "description": "ReLoop: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy, refined through short follow-up questions.",
+  "description": "ReLoop: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy with a sourced price suggestion, refined through short follow-up questions.",
   "author": {
     "name": "hashir107",
     "url": "https://github.com/hashir107"
@@ -13,7 +13,7 @@
       "interface": {
         "displayName": "ReLoop",
         "shortDescription": "Photos to resale metadata and listing copy",
-        "longDescription": "Attach photos of an item and an optional one-line note. ReLoop returns an item summary, a German Kleinanzeigen-style listing with an English version, a few targeted questions and schema-valid JSON metadata, and refines the result as you answer.",
+        "longDescription": "Attach photos of an item and an optional one-line note. ReLoop returns an item summary, a Kleinanzeigen form table with German and English copy and a price suggestion with its basis, a few targeted questions and schema-valid JSON metadata, and refines the result as you answer.",
         "developerName": "hashir107",
         "category": "Productivity",
         "defaultPrompt": [

@@ -299,6 +299,8 @@ def semantic_errors(doc):
             if u["note"] and pattern.search(u["note"]) and why != "serial identifier":
                 errors.append(f"photo_upload_order note for {u['ref']} contains a {why}")
 
+    errors.extend(price_errors(doc, by_id))
+
     en = doc.get("listing_translations", {}).get("en", {})
     nullness = {doc.get("listing_title") is None, doc.get("listing_description") is None,
                 en.get("title") is None, en.get("description") is None}
@@ -319,6 +321,35 @@ def semantic_errors(doc):
     for u in doc.get("unknowns", []):
         if not minischema.pointer_exists(doc, u["field_path"]):
             errors.append(f"unknown field_path {u['field_path']} does not resolve")
+    return errors
+
+
+def price_errors(doc, by_id):
+    """Every price needs a stated, matching basis. See references/pricing.md."""
+    price = doc.get("price_estimate")
+    if price is None:
+        return []
+    errors = []
+    if doc.get("item_type") is None:
+        errors.append("price_estimate must be null while item_type is unknown")
+    if not price["low"] <= price["suggested"] <= price["high"]:
+        errors.append("price_estimate needs low <= suggested <= high")
+    refs = [by_id[r] for r in price["evidence_refs"] if r in by_id]
+    for r in price["evidence_refs"]:
+        if r not in by_id:
+            errors.append(f"price_estimate: evidence_ref {r} does not exist")
+    basis = price["basis"]
+    if basis == "reference_new_price" and not any(
+            e["source"] == "external_reference" and e["url"] for e in refs):
+        errors.append("reference_new_price needs external_reference evidence with a URL")
+    if basis == "user_comparables" and not any(e["source"] == "user_statement" for e in refs):
+        errors.append("user_comparables needs user_statement evidence with the pasted prices")
+    if basis == "model_knowledge":
+        # Cited pages may still appear as context (e.g. "no current new price found").
+        if not any(e["source"] == "inference" and e["certainty"] == "tentative" for e in refs):
+            errors.append("model_knowledge price needs tentative inference evidence")
+    if price["scope"] != "lot" and price["lot_total_suggested"] is not None and (doc.get("quantity") or 0) < 2:
+        errors.append("lot_total_suggested needs a quantity of at least 2")
     return errors
 
 

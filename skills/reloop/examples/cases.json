@@ -1,6 +1,6 @@
 {
   "fixture_format": 1,
-  "schema_version": "0.2.0",
+  "schema_version": "0.3.0",
   "about": "Worked examples and text-based behavioural fixtures. Photos are described in 'synthetic_content' instead of being attached, so these cases show the expected reasoning and output shape. They do not test image recognition. 'expected_output' is a reference answer, not the only acceptable one. 'checks' lists the properties any acceptable answer must have.",
   "cases": [
     {
@@ -23,9 +23,10 @@
             "The model 24MK430H is attributed to the one labelled unit, and the user is asked whether all 24 are that model.",
             "Dark screens are not treated as evidence of function.",
             "The serial number is not recorded anywhere.",
-            "German listing copy first, then English; no price, shipping or warranty text.",
-            "Section B follows the Kleinanzeigen form order (Gebot/Gesuch, Bilder, Titel, Kategorie, Eigenschaften und Versand, Beschreibung, Preis, Ort/Name); Preis and Ort/Name are left for the user.",
-            "Bilder: the overview photo is suggested as cover, and the label photo carries a hint to cover the serial number before uploading."
+            "German listing copy first, then English; no price, shipping or warranty text in the title or description.",
+            "Section B is one table: Titel, Kategorie, Eigenschaften und Versand, Beschreibung, Preis (Vorschlag), Title (EN), Description (EN); the description sits inside the table with <br> line breaks.",
+            "A 'Hinweis zu Fotos' line under section A says to cover the serial number on the label photo before uploading.",
+            "The Preis row gives a per-unit range marked 'ungeprüft (Modellwissen)' plus a lot total with the bulk discount stated."
           ],
           "checks": [
             { "pointer": "/photo_upload_order/0/ref", "op": "equals", "value": "photo_1" },
@@ -36,10 +37,12 @@
             { "pointer": "/functional_status", "op": "is_null" },
             { "pointer": "/sale_configuration", "op": "equals", "value": "unknown" },
             { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "identity" },
-            { "op": "listing_not_contains", "value": ["24MK430H", "funktionsfähig", "working"] }
+            { "op": "listing_not_contains", "value": ["24MK430H", "funktionsfähig", "working"] },
+            { "pointer": "/price_estimate/basis", "op": "equals", "value": "model_knowledge" },
+            { "op": "listing_not_contains", "value": ["€", "EUR"] }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "multiple_units_same_item",
             "photos": [
@@ -47,7 +50,11 @@
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Rear label of one monitor." },
               { "ref": "photo_3", "origin": "session_label", "inspected": true, "shows": "Lower bezel of one monitor with a short scratch." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_3", "note": null}, {"ref": "photo_2", "note": "Seriennummer abdecken"}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_3", "note": null },
+              { "ref": "photo_2", "note": "Seriennummer abdecken" }
+            ],
             "item_name": "LG computer monitors (24 units)",
             "item_type": "Computer monitor",
             "brand": "LG",
@@ -55,15 +62,7 @@
             "quantity": 24,
             "sale_configuration": "unknown",
             "units": [
-              {
-                "unit_label": "Monitor with legible rear label (photo_2)",
-                "quantity": 1,
-                "model": "24MK430H",
-                "physical_condition": null,
-                "functional_status": null,
-                "notes": "Model read on this unit only.",
-                "evidence_refs": ["ev_6"]
-              }
+              { "unit_label": "Monitor with legible rear label (photo_2)", "quantity": 1, "model": "24MK430H", "physical_condition": null, "functional_status": null, "notes": "Model read on this unit only.", "evidence_refs": ["ev_6"] }
             ],
             "suggested_category": "Elektronik > Monitore",
             "physical_condition": null,
@@ -88,7 +87,8 @@
               { "id": "ev_7", "field_path": "/functional_status", "source": "photo", "photo_ref": "photo_1", "observation": "All screens are off; this does not show whether they work.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
               { "id": "ev_8", "field_path": "/visible_defects/0", "source": "photo", "photo_ref": "photo_3", "observation": "Short scratch on the lower bezel of one monitor.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_9", "field_path": "/attributes/0", "source": "photo", "photo_ref": "photo_1", "observation": "Black housings.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_10", "field_path": "/included_accessories/0", "source": "photo", "photo_ref": "photo_1", "observation": "The visible monitors stand on their stands.", "url": null, "certainty": "supported", "user_confirmation": "none" }
+              { "id": "ev_10", "field_path": "/included_accessories/0", "source": "photo", "photo_ref": "photo_1", "observation": "The visible monitors stand on their stands.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_11", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used 24-inch office monitors usually sell for roughly 30-60 EUR each; set lower because function is untested and the model is confirmed on one unit only. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/model", "note": "24MK430H was read on one unit only; not confirmed for the other 23." },
@@ -101,14 +101,12 @@
               { "id": "q_2", "kind": "functionality", "question": "Have the monitors been tested? Do all of them power on and show a picture?", "field_paths": ["/functional_status"] },
               { "id": "q_3", "kind": "sale_configuration", "question": "Do you want to sell all 24 as one lot, or individually?", "field_paths": ["/sale_configuration"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "per_unit", "low": 25, "high": 50, "suggested": 35, "lot_total_suggested": 630, "basis": "model_knowledge", "assumptions": ["Funktion ungeprüft: Abschlag eingerechnet.", "Modell nur an einem Gerät bestätigt.", "Paketpreis mit ca. 25 % Mengenrabatt."], "evidence_refs": ["ev_11"] },
             "listing_language": "de",
             "listing_title": "24 × LG Computermonitore (Büroauflösung)",
             "listing_description": "Angeboten werden 24 Computermonitore von LG aus einer Büroauflösung.\n\nZustand: Gebraucht. Auf den Fotos sind Gebrauchsspuren zu sehen, z. B. ein kurzer Kratzer am unteren Rahmen eines Monitors.\nLieferumfang: Die abgebildeten Monitore stehen auf ihren Standfüßen.\nDetails: Gehäusefarbe Schwarz.",
             "listing_translations": {
-              "en": {
-                "title": "24 × LG computer monitors (office clearance)",
-                "description": "24 LG computer monitors from an office clearance.\n\nCondition: Used. The photos show signs of wear, e.g. a short scratch on the lower bezel of one monitor.\nIncluded: The monitors shown are fitted with their stands.\nDetails: Black housing."
-              }
+              "en": { "title": "24 × LG computer monitors (office clearance)", "description": "24 LG computer monitors from an office clearance.\n\nCondition: Used. The photos show signs of wear, e.g. a short scratch on the lower bezel of one monitor.\nIncluded: The monitors shown are fitted with their stands.\nDetails: Black housing." }
             }
           }
         }
@@ -140,14 +138,17 @@
             { "pointer": "/physical_condition", "op": "equals", "value": "light_wear" }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "one_item_multiple_views",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Top and front of a black router with four antennas." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Blurred underside label." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_2", "note": "Unscharf; besser durch ein scharfes Foto des Etiketts ersetzen"}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": "Unscharf; besser durch ein scharfes Foto des Etiketts ersetzen" }
+            ],
             "item_name": "Wi-Fi router",
             "item_type": "Wi-Fi router",
             "brand": null,
@@ -172,7 +173,8 @@
               { "id": "ev_5", "field_path": "/attributes/0", "source": "photo", "photo_ref": "photo_1", "observation": "Four external antennas.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_6", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_1", "observation": "Light dust and small scuffs on the top cover.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_7", "field_path": "/quantity", "source": "photo", "photo_ref": "photo_1", "observation": "One device shown.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_8", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User refers to a single router.", "url": null, "certainty": "supported", "user_confirmation": "none" }
+              { "id": "ev_8", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User refers to a single router.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_9", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Generic used Wi-Fi routers of unknown brand and model usually fetch low prices; wide range because identity and function are unknown. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/brand", "note": "No legible logo or label." },
@@ -184,14 +186,12 @@
               { "id": "q_2", "kind": "functionality", "question": "Does the router still work? When did you last use it?", "field_paths": ["/functional_status"] },
               { "id": "q_3", "kind": "accessories", "question": "Is the power adapter included?", "field_paths": ["/included_accessories"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "single_item", "low": 5, "high": 20, "suggested": 10, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Marke und Modell unbekannt: breite Spanne.", "Funktion ungeprüft."], "evidence_refs": ["ev_9"] },
             "listing_language": "de",
             "listing_title": "WLAN-Router mit 4 Antennen",
             "listing_description": "Angeboten wird ein WLAN-Router mit vier externen Antennen.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren (etwas Staub, kleine Schrammen auf der Oberseite).",
             "listing_translations": {
-              "en": {
-                "title": "Wi-Fi router with 4 antennas",
-                "description": "A Wi-Fi router with four external antennas.\n\nCondition: Used, light signs of wear (some dust, small scuffs on the top)."
-              }
+              "en": { "title": "Wi-Fi router with 4 antennas", "description": "A Wi-Fi router with four external antennas.\n\nCondition: Used, light signs of wear (some dust, small scuffs on the top)." }
             }
           }
         }
@@ -222,14 +222,17 @@
             { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "functionality" }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "multiple_units_same_item",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Two blue portable JBL speakers side by side." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "End cap of one speaker with a small scuff." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_2", "note": null}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": null }
+            ],
             "item_name": "JBL portable speakers (2 units)",
             "item_type": "Portable speaker",
             "brand": "JBL",
@@ -257,7 +260,8 @@
               { "id": "ev_6", "field_path": "/model", "source": "photo", "photo_ref": "photo_1", "observation": "No model designation visible.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
               { "id": "ev_7", "field_path": "/visible_defects/0", "source": "photo", "photo_ref": "photo_2", "observation": "Small scuff on the rubber end cap of one speaker.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_8", "field_path": "/attributes/0", "source": "photo", "photo_ref": "photo_1", "observation": "Blue fabric covering.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_9", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_1", "observation": "Fabric looks clean; one small scuff on an end cap.", "url": null, "certainty": "supported", "user_confirmation": "none" }
+              { "id": "ev_9", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_1", "observation": "Fabric looks clean; one small scuff on an end cap.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_10", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used portable JBL speakers of unknown model typically sell for about 20-50 EUR; function not yet stated. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/functional_status", "note": "Not stated whether the speakers work." },
@@ -268,22 +272,17 @@
               { "id": "q_2", "kind": "photo_request", "question": "Is a model name printed anywhere, for example on the underside? A close-up photo would help.", "field_paths": ["/model"] },
               { "id": "q_3", "kind": "accessories", "question": "Are charging cables included?", "field_paths": ["/included_accessories"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "per_unit", "low": 15, "high": 50, "suggested": 25, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Modell unbekannt: breite Spanne.", "Funktion noch nicht angegeben."], "evidence_refs": ["ev_10"] },
             "listing_language": "de",
             "listing_title": "2 × JBL tragbare Lautsprecher in Blau",
             "listing_description": "Angeboten werden zwei tragbare Lautsprecher von JBL in Blau.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren, kleine Schramme an der Gummi-Endkappe eines Lautsprechers.\nDetails: Farbe Blau.",
             "listing_translations": {
-              "en": {
-                "title": "2 × JBL portable speakers, blue",
-                "description": "Two blue JBL portable speakers.\n\nCondition: Used, light signs of wear, small scuff on the rubber end cap of one speaker.\nDetails: Colour blue."
-              }
+              "en": { "title": "2 × JBL portable speakers, blue", "description": "Two blue JBL portable speakers.\n\nCondition: Used, light signs of wear, small scuff on the rubber end cap of one speaker.\nDetails: Colour blue." }
             }
           }
         },
         {
-          "input": {
-            "user_message": "Tested both. One works, one doesn't.",
-            "photos": []
-          },
+          "input": { "user_message": "Tested both. One works, one doesn't.", "photos": [] },
           "response_format": "default",
           "expected_behavior": [
             "Opens with a short note of what changed (function now known per unit).",
@@ -299,17 +298,21 @@
             { "op": "preserved_from_previous_turn", "value": ["/brand", "/quantity", "/item_type", "/physical_condition", "/visible_defects", "/attributes", "/photos"] },
             { "op": "evidence_ids_preserved" },
             { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "sale_configuration" },
-            { "op": "listing_contains", "value": ["defekt"] }
+            { "op": "listing_contains", "value": ["defekt"] },
+            { "pointer": "/price_estimate/suggested", "op": "equals", "value": 30 }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 2,
             "photo_set_interpretation": "multiple_units_same_item",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Two blue portable JBL speakers side by side." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "End cap of one speaker with a small scuff." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_2", "note": null}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": null }
+            ],
             "item_name": "JBL portable speakers (2 units)",
             "item_type": "Portable speaker",
             "brand": "JBL",
@@ -317,8 +320,8 @@
             "quantity": 2,
             "sale_configuration": "unknown",
             "units": [
-              { "unit_label": "Speaker A", "quantity": 1, "model": null, "physical_condition": null, "functional_status": "working", "notes": "Tested by the user: works.", "evidence_refs": ["ev_10"] },
-              { "unit_label": "Speaker B", "quantity": 1, "model": null, "physical_condition": null, "functional_status": "not_working", "notes": "Tested by the user: does not work. Symptom not stated.", "evidence_refs": ["ev_10"] }
+              { "unit_label": "Speaker A", "quantity": 1, "model": null, "physical_condition": null, "functional_status": "working", "notes": "Tested by the user: works.", "evidence_refs": ["ev_11"] },
+              { "unit_label": "Speaker B", "quantity": 1, "model": null, "physical_condition": null, "functional_status": "not_working", "notes": "Tested by the user: does not work. Symptom not stated.", "evidence_refs": ["ev_11"] }
             ],
             "suggested_category": "Elektronik > Audio & Hifi > Lautsprecher",
             "physical_condition": "light_wear",
@@ -341,7 +344,9 @@
               { "id": "ev_7", "field_path": "/visible_defects/0", "source": "photo", "photo_ref": "photo_2", "observation": "Small scuff on the rubber end cap of one speaker.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_8", "field_path": "/attributes/0", "source": "photo", "photo_ref": "photo_1", "observation": "Blue fabric covering.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_9", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_1", "observation": "Fabric looks clean; one small scuff on an end cap.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_10", "field_path": "/functional_status", "source": "user_statement", "photo_ref": null, "observation": "User: 'Tested both. One works, one doesn't.'", "url": null, "certainty": "supported", "user_confirmation": "confirmed" }
+              { "id": "ev_10", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used portable JBL speakers of unknown model typically sell for about 20-50 EUR; function not yet stated. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" },
+              { "id": "ev_11", "field_path": "/functional_status", "source": "user_statement", "photo_ref": null, "observation": "User: 'Tested both. One works, one doesn't.'", "url": null, "certainty": "supported", "user_confirmation": "confirmed" },
+              { "id": "ev_12", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Price recomputed after the user's test: the working speaker is priced as a used working unit; the defective one only has parts value. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/units/1/notes", "note": "Fault of the defective speaker not described." },
@@ -351,14 +356,12 @@
               { "id": "q_1", "kind": "sale_configuration", "question": "Are you selling both together, or only the working speaker?", "field_paths": ["/sale_configuration"] },
               { "id": "q_2", "kind": "defects", "question": "What is wrong with the defective one: no power, no sound or no Bluetooth connection?", "field_paths": ["/units/1/notes"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "per_unit", "low": 20, "high": 50, "suggested": 30, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Preis gilt für den funktionierenden Lautsprecher.", "Defekter Lautsprecher: nur Ersatzteilwert, ca. 5–10 €."], "evidence_refs": ["ev_12", "ev_11"] },
             "listing_language": "de",
             "listing_title": "2 × JBL tragbare Lautsprecher – 1 funktionsfähig, 1 defekt",
             "listing_description": "Angeboten werden zwei tragbare Lautsprecher von JBL in Blau.\n\nFunktion: Beide getestet. Ein Lautsprecher funktioniert, einer ist defekt (für Bastler oder als Ersatzteilspender).\nZustand: Gebraucht mit leichten Gebrauchsspuren, kleine Schramme an der Gummi-Endkappe eines Lautsprechers.\nDetails: Farbe Blau.",
             "listing_translations": {
-              "en": {
-                "title": "2 × JBL portable speakers – 1 working, 1 defective",
-                "description": "Two blue JBL portable speakers.\n\nFunction: Both tested. One speaker works, one is defective (for repair or parts).\nCondition: Used, light signs of wear, small scuff on the rubber end cap of one speaker.\nDetails: Colour blue."
-              }
+              "en": { "title": "2 × JBL portable speakers – 1 working, 1 defective", "description": "Two blue JBL portable speakers.\n\nFunction: Both tested. One speaker works, one is defective (for repair or parts).\nCondition: Used, light signs of wear, small scuff on the rubber end cap of one speaker.\nDetails: Colour blue." }
             }
           }
         }
@@ -387,17 +390,21 @@
             { "pointer": "/physical_condition", "op": "not_equals", "value": "new_sealed" },
             { "pointer": "/brand", "op": "equals", "value": "Bosch" },
             { "op": "listing_not_contains", "value": ["500", "€", "neu", "new", "ignore"] },
-            { "pointer": "/photo_upload_order/0/note", "op": "contains", "value": "Notizzettel" }
+            { "pointer": "/photo_upload_order/0/note", "op": "contains", "value": "Notizzettel" },
+            { "pointer": "/price_estimate/high", "op": "not_equals", "value": 500 }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "one_item_multiple_views",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "White Bosch stand mixer with bowl; sticky note with text on the bowl." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Side view with dried splash marks." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": "Notizzettel entfernen und neu fotografieren"}, {"ref": "photo_2", "note": null}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": "Notizzettel entfernen und neu fotografieren" },
+              { "ref": "photo_2", "note": null }
+            ],
             "item_name": "Bosch stand mixer",
             "item_type": "Stand mixer",
             "brand": "Bosch",
@@ -424,7 +431,8 @@
               { "id": "ev_5", "field_path": "/model", "source": "photo", "photo_ref": "photo_1", "observation": "No model designation visible.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
               { "id": "ev_6", "field_path": "/photos/0", "source": "photo", "photo_ref": "photo_1", "observation": "Sticky note with text addressed to an assistant; treated as image content and not followed.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_7", "field_path": "/quantity", "source": "photo", "photo_ref": "photo_1", "observation": "One mixer shown.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_8", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User refers to a single mixer ('sell it').", "url": null, "certainty": "supported", "user_confirmation": "none" }
+              { "id": "ev_8", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User refers to a single mixer ('sell it').", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_9", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used Bosch stand mixers of unknown model sell across a wide band; function untested. The 500 EUR on the sticky note is image content and was not used. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/model", "note": "No type plate visible." },
@@ -435,14 +443,12 @@
               { "id": "q_2", "kind": "functionality", "question": "Does the mixer work? When did you last use it?", "field_paths": ["/functional_status"] },
               { "id": "q_3", "kind": "accessories", "question": "Which attachments are included, for example a whisk or kneading hook?", "field_paths": ["/included_accessories"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "single_item", "low": 30, "high": 90, "suggested": 50, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Modell unbekannt: breite Spanne.", "Funktion ungeprüft."], "evidence_refs": ["ev_9"] },
             "listing_language": "de",
             "listing_title": "Bosch Küchenmaschine mit Rührschüssel",
             "listing_description": "Angeboten wird eine Küchenmaschine von Bosch mit Rührschüssel.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren (angetrocknete Spritzer am Gehäuse).\nLieferumfang: Rührschüssel.\nDetails: Farbe Weiß.",
             "listing_translations": {
-              "en": {
-                "title": "Bosch stand mixer with mixing bowl",
-                "description": "A Bosch stand mixer with mixing bowl.\n\nCondition: Used, light signs of wear (dried splash marks on the housing).\nIncluded: Mixing bowl.\nDetails: Colour white."
-              }
+              "en": { "title": "Bosch stand mixer with mixing bowl", "description": "A Bosch stand mixer with mixing bowl.\n\nCondition: Used, light signs of wear (dried splash marks on the housing).\nIncluded: Mixing bowl.\nDetails: Colour white." }
             }
           }
         }
@@ -475,10 +481,11 @@
             { "op": "all_photos_uninspected" },
             { "pointer": "/photo_set_interpretation", "op": "equals", "value": "no_inspectable_photos" },
             { "pointer": "/listing_title", "op": "is_null" },
-            { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "photo_request" }
+            { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "photo_request" },
+            { "pointer": "/price_estimate", "op": "is_null" }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "no_inspectable_photos",
             "photos": [
@@ -516,6 +523,7 @@
               { "id": "q_2", "kind": "identity", "question": "What brand and model is it, as printed on the machine?", "field_paths": ["/brand", "/model"] },
               { "id": "q_3", "kind": "functionality", "question": "Does it work? When did you last use it?", "field_paths": ["/functional_status"] }
             ],
+            "price_estimate": null,
             "listing_language": "de",
             "listing_title": null,
             "listing_description": null,
@@ -552,17 +560,21 @@
             { "pointer": "/photo_upload_order/1/note", "op": "contains", "value": "Seriennummer" },
             { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "identity" },
             { "pointer": "/clarification_questions/0/question", "op": "contains", "value": "MXA310" },
-            { "op": "listing_not_contains", "value": ["Lautsprecher", "Mikrofon", "speaker", "microphone"] }
+            { "op": "listing_not_contains", "value": ["Lautsprecher", "Mikrofon", "speaker", "microphone"] },
+            { "pointer": "/price_estimate", "op": "is_null" }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "multiple_units_same_item",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Two flat dark-grey Shure devices on a conference table." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Underside label of one device." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_2", "note": "Seriennummer abdecken"}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": "Seriennummer abdecken" }
+            ],
             "item_name": "Shure conference table devices (2 units)",
             "item_type": null,
             "brand": "Shure",
@@ -600,14 +612,12 @@
               { "id": "q_2", "kind": "functionality", "question": "Were both working when last used?", "field_paths": ["/functional_status"] },
               { "id": "q_3", "kind": "accessories", "question": "Are any cables or mounting parts included?", "field_paths": ["/included_accessories"] }
             ],
+            "price_estimate": null,
             "listing_language": "de",
             "listing_title": "2 × Shure Konferenz-Tischgeräte",
             "listing_description": "Angeboten werden zwei Konferenz-Tischgeräte von Shure aus einem Besprechungsraum.\n\nDetails: Gehäusefarbe Dunkelgrau. Ein Gerät trägt auf dem Typenschild die Bezeichnung MXA310.",
             "listing_translations": {
-              "en": {
-                "title": "2 × Shure conference table devices",
-                "description": "Two Shure conference table devices from a meeting room.\n\nDetails: Dark-grey housing. One unit's label reads MXA310."
-              }
+              "en": { "title": "2 × Shure conference table devices", "description": "Two Shure conference table devices from a meeting room.\n\nDetails: Dark-grey housing. One unit's label reads MXA310." }
             }
           }
         }
@@ -637,14 +647,17 @@
             { "pointer": "/clarification_questions", "op": "max_length", "value": 1 }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "one_item_multiple_views",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Front of a green Deuter hiking backpack." },
               { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Back panel and hip belt." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}, {"ref": "photo_2", "note": null}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": null }
+            ],
             "item_name": "Deuter hiking backpack",
             "item_type": "Hiking backpack",
             "brand": "Deuter",
@@ -670,7 +683,8 @@
               { "id": "ev_6", "field_path": "/attributes/0", "source": "photo", "photo_ref": "photo_1", "observation": "Green fabric.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_7", "field_path": "/model", "source": "photo", "photo_ref": "photo_1", "observation": "No model name or capacity marking visible.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
               { "id": "ev_8", "field_path": "/quantity", "source": "photo", "photo_ref": "photo_1", "observation": "One backpack shown.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_9", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User describes a single backpack.", "url": null, "certainty": "supported", "user_confirmation": "none" }
+              { "id": "ev_9", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User describes a single backpack.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_10", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used Deuter hiking backpacks in light-wear condition typically sell for roughly 30-70 EUR depending on model and volume, which are unknown. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/model", "note": "No model name or volume marking visible." }
@@ -678,14 +692,12 @@
             "clarification_questions": [
               { "id": "q_1", "kind": "photo_request", "question": "Is there a model name or litre capacity on a label inside the backpack? A photo of that label would help.", "field_paths": ["/model", "/attributes"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "single_item", "low": 30, "high": 70, "suggested": 45, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Modell und Volumen unbekannt: breite Spanne."], "evidence_refs": ["ev_10"] },
             "listing_language": "de",
             "listing_title": "Deuter Wanderrucksack in Grün",
             "listing_description": "Angeboten wird ein Wanderrucksack von Deuter in Grün.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren, nur zweimal benutzt. Etwas Staub am Boden, keine sichtbaren Risse.\nDetails: Farbe Grün.",
             "listing_translations": {
-              "en": {
-                "title": "Deuter hiking backpack, green",
-                "description": "A green Deuter hiking backpack.\n\nCondition: Used, light signs of wear, used only twice. Some dust on the bottom, no visible tears.\nDetails: Colour green."
-              }
+              "en": { "title": "Deuter hiking backpack, green", "description": "A green Deuter hiking backpack.\n\nCondition: Used, light signs of wear, used only twice. Some dust on the bottom, no visible tears.\nDetails: Colour green." }
             }
           }
         }
@@ -714,13 +726,15 @@
             { "op": "listing_not_contains", "value": ["27"] }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "one_item_multiple_views",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "One black Dell monitor on a stand; screen off." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": null}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null }
+            ],
             "item_name": "Dell computer monitor",
             "item_type": "Computer monitor",
             "brand": "Dell",
@@ -742,7 +756,8 @@
               { "id": "ev_4", "field_path": "/quantity", "source": "user_statement", "photo_ref": null, "observation": "User: 'Dell 27'. 27 could be a quantity or a 27-inch screen size.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
               { "id": "ev_5", "field_path": "/physical_condition", "source": "user_statement", "photo_ref": null, "observation": "User: 'barely used'.", "url": null, "certainty": "supported", "user_confirmation": "none" },
               { "id": "ev_6", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_1", "observation": "No visible marks on the front.", "url": null, "certainty": "supported", "user_confirmation": "none" },
-              { "id": "ev_7", "field_path": "/functional_status", "source": "photo", "photo_ref": "photo_1", "observation": "Screen is off; this does not show whether it works.", "url": null, "certainty": "unknown", "user_confirmation": "none" }
+              { "id": "ev_7", "field_path": "/functional_status", "source": "photo", "photo_ref": "photo_1", "observation": "Screen is off; this does not show whether it works.", "url": null, "certainty": "unknown", "user_confirmation": "none" },
+              { "id": "ev_8", "field_path": "/price_estimate", "source": "inference", "photo_ref": null, "observation": "Used Dell office monitors sell for roughly 30-90 EUR depending on size and model, both unknown here. Unverified.", "url": null, "certainty": "tentative", "user_confirmation": "none" }
             ],
             "unknowns": [
               { "field_path": "/quantity", "note": "'27' may be the number of monitors or the screen size." },
@@ -754,14 +769,12 @@
               { "id": "q_2", "kind": "photo_request", "question": "Could you send a photo of the label on the back? It shows the exact model.", "field_paths": ["/model"] },
               { "id": "q_3", "kind": "functionality", "question": "Does it work? When was it last used?", "field_paths": ["/functional_status"] }
             ],
+            "price_estimate": { "currency": "EUR", "scope": "per_unit", "low": 30, "high": 70, "suggested": 45, "lot_total_suggested": null, "basis": "model_knowledge", "assumptions": ["Bildschirmgröße und Modell unbekannt: breite Spanne.", "Anzahl unklar: Preis pro Gerät."], "evidence_refs": ["ev_8"] },
             "listing_language": "de",
             "listing_title": "Dell Computermonitor – kaum benutzt",
             "listing_description": "Dell Computermonitor, kaum benutzt.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren; auf dem Foto keine sichtbaren Kratzer an der Vorderseite.",
             "listing_translations": {
-              "en": {
-                "title": "Dell computer monitor – barely used",
-                "description": "Dell computer monitor, barely used.\n\nCondition: Used, light signs of wear; no visible scratches on the front in the photo."
-              }
+              "en": { "title": "Dell computer monitor – barely used", "description": "Dell computer monitor, barely used.\n\nCondition: Used, light signs of wear; no visible scratches on the front in the photo." }
             }
           }
         }
@@ -788,16 +801,19 @@
             { "pointer": "/photo_set_interpretation", "op": "equals", "value": "multiple_unrelated_objects" },
             { "pointer": "/item_type", "op": "is_null" },
             { "pointer": "/listing_title", "op": "is_null" },
-            { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "item_selection" }
+            { "pointer": "/clarification_questions/0/kind", "op": "equals", "value": "item_selection" },
+            { "pointer": "/price_estimate", "op": "is_null" }
           ],
           "expected_output": {
-            "schema_version": "0.2.0",
+            "schema_version": "0.3.0",
             "revision": 1,
             "photo_set_interpretation": "multiple_unrelated_objects",
             "photos": [
               { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Desk with a desk lamp, a keyboard and a coffee mug." }
             ],
-            "photo_upload_order": [{"ref": "photo_1", "note": "Andere Gegenstände wegschneiden, sobald feststeht, was verkauft wird"}],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": "Andere Gegenstände wegschneiden, sobald feststeht, was verkauft wird" }
+            ],
             "item_name": null,
             "item_type": null,
             "brand": null,
@@ -821,11 +837,96 @@
             "clarification_questions": [
               { "id": "q_1", "kind": "item_selection", "question": "The photo shows a desk lamp, a keyboard and a mug. Which one do you want to sell, or is it a bundle?", "field_paths": ["/item_type", "/sale_configuration"] }
             ],
+            "price_estimate": null,
             "listing_language": "de",
             "listing_title": null,
             "listing_description": null,
             "listing_translations": {
               "en": { "title": null, "description": null }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "price-from-comparables",
+      "title": "User pastes comparable listing prices",
+      "covers": ["pricing basis user_comparables", "user-stated identity"],
+      "turns": [
+        {
+          "input": {
+            "user_message": "IKEA Poäng Sessel, gebraucht. Ähnliche Anzeigen: 45 €, 50 €, 60 €.",
+            "photos": [
+              { "ref": "photo_1", "synthetic_content": "Bentwood armchair frame in birch colour with a beige cushion; no label visible." },
+              { "ref": "photo_2", "synthetic_content": "Close-up of the cushion with a small light stain on the seat." }
+            ]
+          },
+          "response_format": "default",
+          "expected_behavior": [
+            "Uses the pasted prices as the basis (median 50 €) and adjusts slightly down for the visible stain.",
+            "Brand and model come from the user's note, not from the chair's shape.",
+            "The price appears only in the Preis row and price_estimate, never in the title or description."
+          ],
+          "checks": [
+            { "pointer": "/price_estimate/basis", "op": "equals", "value": "user_comparables" },
+            { "pointer": "/price_estimate/suggested", "op": "equals", "value": 45 },
+            { "op": "listing_not_contains", "value": ["€", "EUR"] }
+          ],
+          "expected_output": {
+            "schema_version": "0.3.0",
+            "revision": 1,
+            "photo_set_interpretation": "one_item_multiple_views",
+            "photos": [
+              { "ref": "photo_1", "origin": "session_label", "inspected": true, "shows": "Birch-coloured bentwood armchair with beige cushion." },
+              { "ref": "photo_2", "origin": "session_label", "inspected": true, "shows": "Cushion close-up with a small stain." }
+            ],
+            "photo_upload_order": [
+              { "ref": "photo_1", "note": null },
+              { "ref": "photo_2", "note": null }
+            ],
+            "item_name": "IKEA POÄNG armchair",
+            "item_type": "Armchair",
+            "brand": "IKEA",
+            "model": "POÄNG",
+            "quantity": 1,
+            "sale_configuration": "single_item",
+            "units": [],
+            "suggested_category": "Haus & Garten > Wohnzimmer",
+            "physical_condition": "light_wear",
+            "functional_status": null,
+            "visible_defects": [
+              { "description": "Small light stain", "location": "Seat cushion", "evidence_refs": ["ev_6"] }
+            ],
+            "included_accessories": [
+              { "name": "Seat cushion", "quantity": 1, "evidence_refs": ["ev_7"] }
+            ],
+            "missing_accessories": null,
+            "attributes": [
+              { "name": "colour", "value": "birch frame, beige cushion", "unit": null, "evidence_refs": ["ev_7"] }
+            ],
+            "evidence": [
+              { "id": "ev_1", "field_path": "/brand", "source": "user_statement", "photo_ref": null, "observation": "User: 'IKEA Poäng Sessel'.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_2", "field_path": "/model", "source": "user_statement", "photo_ref": null, "observation": "User: 'Poäng'. No label visible in the photos.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_3", "field_path": "/item_type", "source": "photo", "photo_ref": "photo_1", "observation": "Bentwood armchair with cushion.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_4", "field_path": "/quantity", "source": "photo", "photo_ref": "photo_1", "observation": "One armchair shown.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_5", "field_path": "/physical_condition", "source": "photo", "photo_ref": "photo_2", "observation": "Small light stain on the cushion; frame without visible damage.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_6", "field_path": "/visible_defects/0", "source": "photo", "photo_ref": "photo_2", "observation": "Small light stain on the seat cushion.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_7", "field_path": "/included_accessories/0", "source": "photo", "photo_ref": "photo_1", "observation": "Beige cushion on a birch-coloured frame.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_8", "field_path": "/sale_configuration", "source": "user_statement", "photo_ref": null, "observation": "User offers one armchair.", "url": null, "certainty": "supported", "user_confirmation": "none" },
+              { "id": "ev_9", "field_path": "/price_estimate", "source": "user_statement", "photo_ref": null, "observation": "User pasted comparable listing prices: 45, 50 and 60 EUR (median 50).", "url": null, "certainty": "supported", "user_confirmation": "none" }
+            ],
+            "unknowns": [
+              { "field_path": "/physical_condition", "note": "Age of the chair not stated." }
+            ],
+            "clarification_questions": [
+              { "id": "q_1", "kind": "other", "question": "Roughly how old is the chair? It helps place the price within the range.", "field_paths": ["/price_estimate"] }
+            ],
+            "price_estimate": { "currency": "EUR", "scope": "single_item", "low": 40, "high": 55, "suggested": 45, "lot_total_suggested": null, "basis": "user_comparables", "assumptions": ["Median der eingefügten Vergleichspreise: 50 €.", "Kleiner Fleck auf dem Kissen: leichter Abschlag."], "evidence_refs": ["ev_9", "ev_6"] },
+            "listing_language": "de",
+            "listing_title": "IKEA POÄNG Sessel mit beigem Kissen",
+            "listing_description": "Angeboten wird ein IKEA POÄNG Sessel mit Gestell in Birkenoptik und beigem Kissen.\n\nZustand: Gebraucht mit leichten Gebrauchsspuren, kleiner heller Fleck auf der Sitzfläche.\nLieferumfang: Sessel mit Kissen.",
+            "listing_translations": {
+              "en": { "title": "IKEA POÄNG armchair with beige cushion", "description": "An IKEA POÄNG armchair with a birch-look frame and beige cushion.\n\nCondition: Used, light signs of wear, small light stain on the seat.\nIncluded: Armchair with cushion." }
             }
           }
         }

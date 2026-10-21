@@ -178,6 +178,48 @@ class RuleNegatives(unittest.TestCase):
         self.doc["listing_description"] += "\nPreis: 50 € VB"
         self.assertTrue(any("price" in e for e in self.errors()))
 
+    def price_ev(self, eid, source, certainty, url=None):
+        self.doc["evidence"].append({"id": eid, "field_path": "/price_estimate", "source": source, "photo_ref": None,
+                                     "observation": "Price basis.", "url": url, "certainty": certainty,
+                                     "user_confirmation": "none"})
+
+    def test_price_range_must_be_ordered(self):
+        self.doc["price_estimate"]["low"] = 60
+        self.assertTrue(any("low <= suggested <= high" in e for e in self.errors()))
+
+    def test_reference_new_price_needs_cited_url(self):
+        self.price_ev("ev_20", "inference", "tentative")
+        self.doc["price_estimate"].update(basis="reference_new_price", evidence_refs=["ev_20"])
+        self.assertTrue(any("external_reference evidence with a URL" in e for e in self.errors()))
+
+    def test_reference_new_price_with_cited_url_is_valid(self):
+        self.price_ev("ev_20", "external_reference", "supported", url="https://example.com/lg-24mk430h")
+        self.doc["price_estimate"].update(basis="reference_new_price", evidence_refs=["ev_20"])
+        self.assertEqual(self.errors(), [])
+        self.assertEqual(minischema.validate(self.doc, validate.load_schema()), [])
+
+    def test_model_knowledge_must_be_tentative(self):
+        ref = self.doc["price_estimate"]["evidence_refs"][0]
+        next(e for e in self.doc["evidence"] if e["id"] == ref)["certainty"] = "supported"
+        self.assertTrue(any("tentative inference" in e for e in self.errors()))
+
+    def test_user_comparables_need_user_statement(self):
+        self.doc["price_estimate"]["basis"] = "user_comparables"
+        self.assertTrue(any("user_statement" in e for e in self.errors()))
+
+    def test_no_price_without_item_type(self):
+        self.doc["item_type"] = None
+        self.doc["evidence"] = [e for e in self.doc["evidence"] if e["field_path"] != "/item_type"]
+        self.assertTrue(any("item_type is unknown" in e for e in self.errors()))
+
+    def test_price_schema_rejects_other_currency_and_negative(self):
+        schema = validate.load_schema()
+        self.doc["price_estimate"]["currency"] = "USD"
+        self.assertTrue(minischema.validate(self.doc, schema))
+        self.doc["price_estimate"]["currency"] = "EUR"
+        self.doc["price_estimate"]["low"] = -5
+        self.assertTrue(minischema.validate(self.doc, schema))
+
     def test_serial_number_in_listing_rejected(self):
         self.doc["listing_translations"]["en"]["description"] += "\nS/N 912KXQZ48213"
         self.assertTrue(any("serial" in e for e in self.errors()))

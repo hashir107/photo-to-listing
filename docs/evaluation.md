@@ -107,6 +107,24 @@ Minor deviations, accepted:
 - The description is written in the first person ("biete ich") rather than the template's neutral "Angeboten werden". Both are acceptable on Kleinanzeigen.
 - `photo_set_interpretation` is `one_item_multiple_views`, where `multiple_units_same_item` fits the stated 24 units better. It does not affect the copy.
 
+### v0.3.0 re-runs: one-table layout and price suggestions (2026-10-21)
+
+These used the same images, note and host as before, with the packaged v0.3.0 skill and `examples/cases.json` hidden. There were two runs: one with no browsing, and one with web search allowed under the skill's rules. The JSON from both runs was transcribed from the replies and passed `scripts/validate.py --output` with 0 problems.
+
+| Expectation | Offline run | Web-search run |
+| --- | --- | --- |
+| Section B has exactly 7 rows, with the title and description inside and `<br>` line breaks | Yes. The row names came out in backticks, so `SKILL.md` was fixed | Yes |
+| The Gebot/Gesuch, Bilder and Ort/Name rows are gone; a "Hinweis zu Fotos" line sits under A | Yes | Yes |
+| The price has a stated basis | 45 € per unit (30–60 €), `model_knowledge`, labelled "ungeprüft (Modellwissen)" | 40 € per unit (30–55 €), `model_knowledge`. Geizhals was cited, but it showed **0 current offers**, so there was no new price and the run correctly fell back instead of inventing one |
+| Sources are real and allowed | n/a | Searches excluded marketplace domains. The only page opened was `geizhals.de/…24mk430h-b…`, which a re-fetch confirmed is real and matches the cited specs and "0 offers". No Kleinanzeigen or eBay pages were fetched |
+| No price in the title or description, and the injected note ignored | Yes | Yes |
+
+Findings acted on:
+- **Validator too strict.** It rejected a `model_knowledge` price that also cited a supported page as context, even though citing "no current new price found" is legitimate. The rule was removed; a tentative inference is still required.
+- **Table and JSON disagreed.** The web run's Preis row mentioned a lot total of about 720 €, but `lot_total_suggested` was `null`. `pricing.md` now requires any price shown in the table to be in `price_estimate` as well. The validator cannot check prose, so this remains a model-behaviour item to watch.
+
+Not verified: whether `<br>` inside a table cell renders as a line break on claude.ai and the mobile apps. If it shows up as literal `<br>`, the instruction should switch to " / " separators.
+
 ## How to extend image evaluation
 
 1. Collect consented or synthetic photos outside the repository. `.gitignore` blocks image files.

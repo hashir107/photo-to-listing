@@ -4,21 +4,22 @@ ReLoop writes copy in the style of Kleinanzeigen listings. It does not integrate
 
 ## Form map
 
-Section B follows the order of Kleinanzeigen's "Anzeige aufgeben" form. The order and limits below were read from a copy of the form saved on 2026-10-21; re-check them if the form changes.
+Section B is one table in the order of Kleinanzeigen's "Anzeige aufgeben" form, so the user can copy it field by field. The order and limits below were read from a copy of the form saved on 2026-10-21; re-check them if the form changes. Gebot/Gesuch, Bilder, Ort and Name are left out of the table on purpose: the user handles them directly on the form.
 
-| # | Form field | Limit on the form | What ReLoop puts there |
-| --- | --- | --- | --- |
-| 1 | Gebot / Gesuch | Ich biete / Ich suche | "Ich biete" |
-| 2 | Bilder | up to 20 images, max. 12 MB each | Upload order from `photo_upload_order`, cover first, with cleanup notes |
-| 3 | Titel | max. 65 characters | `listing_title`, with "n/65" shown |
-| 4 | Kategorie | picker; Kleinanzeigen pre-selects one after the title is entered | `suggested_category` as a human-readable suggestion |
-| 5 | Eigenschaften und Versand | depends on the category; options not verified | Condition and key attributes in ReLoop's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
-| 6 | Beschreibung | max. 4000 characters | `listing_description`, with "n/4000" shown |
-| 7 | Preis, Preistyp | user's choice | "selbst festlegen". ReLoop never suggests a price or price type |
-| 8 | Ort (PLZ, Ort, Straße) | user's data | "selbst ausfüllen". Never fill in or suggest an address |
-| 9 | Name | user's data | "selbst ausfüllen" |
+| Row in section B | Form limit | What ReLoop puts there |
+| --- | --- | --- |
+| `Titel (n/65)` | max. 65 characters | `listing_title`, with its character count |
+| `Kategorie` | picker; Kleinanzeigen pre-selects one after the title is entered | `suggested_category` as a human-readable suggestion |
+| `Eigenschaften und Versand` | depends on the category; options not verified | Condition and key attributes in ReLoop's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
+| `Beschreibung (n/4000)` | max. 4000 characters | the full `listing_description`, with each line break written as `<br>` inside the cell |
+| `Preis (Vorschlag)` | price in whole euros; Preistyp (e.g. Festpreis) | the `price_estimate` range and basis, following `references/pricing.md`. Preistyp: "selbst wählen" |
+| `Title (EN)` | not part of the form | `listing_translations.en.title` |
+| `Description (EN)` | not part of the form | `listing_translations.en.description`, with `<br>` line breaks |
+
+Inside table cells, write each line break as `<br>` and escape `|` as `\|`. The JSON keeps the real newlines (`\n`).
 
 ### Photo upload hints (`photo_upload_order`)
+These are not a table row. They appear as one **Hinweis zu Fotos** line under section A, and only when a photo has a note.
 - Put the clearest overall photo of the item first, because it becomes the cover. Close-ups of labels, defects and accessories come after it.
 - List only photos you actually inspected.
 - Add a `note` when a photo needs attention before upload. Examples: "Seriennummer abdecken" when a serial number, IMEI or MAC address is legible; "Persönliche Daten abdecken" for names, addresses or documents; "Notizzettel entfernen" for stray notes; "Andere Gegenstände wegschneiden" for unrelated objects in the frame. Otherwise `note` is `null`.
@@ -30,7 +31,7 @@ Section B follows the order of Kleinanzeigen's "Anzeige aufgeben" form. The orde
 - Include only supported facts: identity, brand and model where known, quantity, whether the offer is a single item, individual units or a bundle, physical condition, user-reported function, known defects, and included and missing accessories.
 - Attribute function to what the user reported: "Getestet und funktionsfähig" only if the user said they tested it. Otherwise leave function out, or say "nicht getestet" if the user said so.
 - Do not present unresolved guesses as facts. Leave uncertain specifications out. Qualify one only when it is genuinely useful and true, for example "Laut Typenschild eines Geräts: Modell 24MK430H".
-- Never invent or add: an asking price, "VB" or negotiation terms, pickup or shipping, the reason for selling (use it only if the user gave one), warranty or return terms, private-seller status, legal disclaimers such as "Privatverkauf, keine Garantie", or claims like "wie neu", "top Zustand" or "neuwertig".
+- Never put a price in the title or description; it belongs in the Preis row. Never invent or add "VB" or negotiation terms, pickup or shipping, the reason for selling (use it only if the user gave one), warranty or return terms, private-seller status, legal disclaimers such as "Privatverkauf, keine Garantie", or claims like "wie neu", "top Zustand" or "neuwertig".
 - Keep serial numbers, personal data and precise locations out unless the user explicitly asks to include them.
 - If there is too little supported information for a meaningful listing, set the listing fields to `null` and say why in the summary.
 
