@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.1.0",
+  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.2.0",
   "title": "ReLoop listing metadata",
   "description": "Structured re-commerce metadata and Kleinanzeigen-style listing copy derived from user-supplied photos and notes. Unknown scalar values are null. For the assessable lists (visible_defects, included_accessories, missing_accessories), null means not assessed and [] means assessed with nothing found or confirmed. See references/extraction-rules.md.",
   "type": "object",
@@ -10,6 +10,7 @@
     "revision",
     "photo_set_interpretation",
     "photos",
+    "photo_upload_order",
     "item_name",
     "item_type",
     "brand",
@@ -35,7 +36,7 @@
   "properties": {
     "schema_version": {
       "description": "Version of this schema the document conforms to.",
-      "const": "0.1.0"
+      "const": "0.2.0"
     },
     "revision": {
       "description": "Starts at 1 and increments with each update in the same conversation.",
@@ -57,7 +58,17 @@
     "photos": {
       "description": "Every photo the user supplied in this conversation, in the order received.",
       "type": "array",
-      "items": { "$ref": "#/$defs/photo" }
+      "items": {
+        "$ref": "#/$defs/photo"
+      }
+    },
+    "photo_upload_order": {
+      "description": "Recommended upload order for the Kleinanzeigen 'Bilder' field (max. 20 images); the first entry is the cover photo. Lists only inspected photos; empty when none were inspected.",
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/photo_upload"
+      }
     },
     "item_name": {
       "description": "Short human-readable name of the offered item or bundle.",
@@ -77,17 +88,27 @@
     },
     "quantity": {
       "description": "Number of physical units offered. Null when unknown or ambiguous.",
-      "type": ["integer", "null"],
+      "type": [
+        "integer",
+        "null"
+      ],
       "minimum": 1
     },
     "sale_configuration": {
       "description": "single_item: one item offered. individual_units: several units, each sold separately. bundle: everything sold together as one lot. unknown: not yet stated.",
-      "enum": ["single_item", "individual_units", "bundle", "unknown"]
+      "enum": [
+        "single_item",
+        "individual_units",
+        "bundle",
+        "unknown"
+      ]
     },
     "units": {
       "description": "Per-unit facts when units differ or were assessed individually. Use an empty array when units are not distinguished.",
       "type": "array",
-      "items": { "$ref": "#/$defs/unit" }
+      "items": {
+        "$ref": "#/$defs/unit"
+      }
     },
     "suggested_category": {
       "description": "Human-readable marketplace category suggestion. Not an official category ID.",
@@ -103,77 +124,131 @@
     },
     "visible_defects": {
       "description": "Defects or damage. null = not assessed; [] = assessed and none seen or confirmed.",
-      "type": ["array", "null"],
-      "items": { "$ref": "#/$defs/defect" }
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/defect"
+      }
     },
     "included_accessories": {
       "description": "Accessories confirmed as included. null = not assessed; [] = confirmed that nothing is included. A non-empty list does not imply nothing else is included.",
-      "type": ["array", "null"],
-      "items": { "$ref": "#/$defs/accessory" }
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/accessory"
+      }
     },
     "missing_accessories": {
       "description": "Accessories confirmed as missing. null = not assessed; [] = confirmed that nothing is missing.",
-      "type": ["array", "null"],
-      "items": { "$ref": "#/$defs/accessory" }
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/accessory"
+      }
     },
     "attributes": {
       "description": "Category-specific attributes such as screen size, colour or capacity.",
       "type": "array",
-      "items": { "$ref": "#/$defs/attribute" }
+      "items": {
+        "$ref": "#/$defs/attribute"
+      }
     },
     "evidence": {
       "description": "Evidence records supporting, qualifying or contradicting fields.",
       "type": "array",
-      "items": { "$ref": "#/$defs/evidence" }
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
     },
     "unknowns": {
       "description": "Important information that is still unknown or unresolved.",
       "type": "array",
-      "items": { "$ref": "#/$defs/unknown" }
+      "items": {
+        "$ref": "#/$defs/unknown"
+      }
     },
     "clarification_questions": {
       "description": "At most three high-value questions for the next turn.",
       "type": "array",
       "maxItems": 3,
-      "items": { "$ref": "#/$defs/question" }
+      "items": {
+        "$ref": "#/$defs/question"
+      }
     },
     "listing_language": {
       "description": "Language of listing_title and listing_description.",
       "const": "de"
     },
     "listing_title": {
-      "description": "German listing title. Null when there is not enough supported information.",
-      "$ref": "#/$defs/nullable_text"
+      "description": "German listing title (Kleinanzeigen 'Titel', max. 65 characters). Null when there is not enough supported information.",
+      "$ref": "#/$defs/listing_title"
     },
     "listing_description": {
-      "description": "German listing description. Null when there is not enough supported information.",
-      "$ref": "#/$defs/nullable_text"
+      "description": "German listing description (Kleinanzeigen 'Beschreibung', max. 4000 characters). Null when there is not enough supported information.",
+      "$ref": "#/$defs/listing_description"
     },
     "listing_translations": {
       "description": "The same listing in other languages, keyed by language code.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["en"],
+      "required": [
+        "en"
+      ],
       "properties": {
-        "en": { "$ref": "#/$defs/listing_copy" }
+        "en": {
+          "$ref": "#/$defs/listing_copy"
+        }
       }
     }
   },
   "$defs": {
     "nullable_text": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "minLength": 1
+    },
+    "listing_title": {
+      "description": "Matches the 65-character limit of the Kleinanzeigen title field.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 65
+    },
+    "listing_description": {
+      "description": "Matches the 4000-character limit of the Kleinanzeigen description field.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "maxLength": 4000
     },
     "evidence_refs": {
       "description": "Ids of evidence records.",
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^ev_[0-9]+$" }
+      "items": {
+        "type": "string",
+        "pattern": "^ev_[0-9]+$"
+      }
     },
     "physical_condition": {
       "description": "new_sealed: factory seal intact (seen or user-confirmed). unused_open_box: user states never used, packaging opened. light_wear: minor marks only. moderate_wear: clearly visible scratches or scuffs. heavy_wear: extensive wear. damaged: cracks, dents, breaks or missing parts of the item itself. mixed: units differ (see units).",
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "new_sealed",
         "unused_open_box",
@@ -187,7 +262,10 @@
     },
     "functional_status": {
       "description": "working: user (or a cited test) reports it works. partially_working: some functions fail. not_working: reported defective. untested: the user states it has not been tested. mixed: units differ (see units).",
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "enum": [
         "working",
         "partially_working",
@@ -200,7 +278,12 @@
     "photo": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ref", "origin", "inspected", "shows"],
+      "required": [
+        "ref",
+        "origin",
+        "inspected",
+        "shows"
+      ],
       "properties": {
         "ref": {
           "description": "Host-provided identifier, or a session label such as photo_1. Never a URL.",
@@ -209,7 +292,10 @@
         },
         "origin": {
           "description": "host_identifier: id given by the host. session_label: label assigned in this conversation.",
-          "enum": ["host_identifier", "session_label"]
+          "enum": [
+            "host_identifier",
+            "session_label"
+          ]
         },
         "inspected": {
           "description": "True only if the image itself was actually viewed.",
@@ -218,6 +304,30 @@
         "shows": {
           "description": "Brief neutral description of what the photo shows. Null if not inspected.",
           "$ref": "#/$defs/nullable_text"
+        }
+      }
+    },
+    "photo_upload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "note"
+      ],
+      "properties": {
+        "ref": {
+          "description": "Ref of an inspected photo listed in photos.",
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "description": "Short German hint before uploading, e.g. 'Seriennummer abdecken'; null if none.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 120
         }
       }
     },
@@ -234,51 +344,109 @@
         "evidence_refs"
       ],
       "properties": {
-        "unit_label": { "type": "string", "minLength": 1 },
-        "quantity": { "type": ["integer", "null"], "minimum": 1 },
-        "model": { "$ref": "#/$defs/nullable_text" },
-        "physical_condition": { "$ref": "#/$defs/physical_condition" },
-        "functional_status": { "$ref": "#/$defs/functional_status" },
-        "notes": { "$ref": "#/$defs/nullable_text" },
-        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+        "unit_label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "model": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "physical_condition": {
+          "$ref": "#/$defs/physical_condition"
+        },
+        "functional_status": {
+          "$ref": "#/$defs/functional_status"
+        },
+        "notes": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/evidence_refs"
+        }
       }
     },
     "defect": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["description", "location", "evidence_refs"],
+      "required": [
+        "description",
+        "location",
+        "evidence_refs"
+      ],
       "properties": {
-        "description": { "type": "string", "minLength": 1 },
-        "location": { "$ref": "#/$defs/nullable_text" },
-        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/evidence_refs"
+        }
       }
     },
     "accessory": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "quantity", "evidence_refs"],
+      "required": [
+        "name",
+        "quantity",
+        "evidence_refs"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "quantity": { "type": ["integer", "null"], "minimum": 1 },
-        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "evidence_refs": {
+          "$ref": "#/$defs/evidence_refs"
+        }
       }
     },
     "attribute": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "value", "unit", "evidence_refs"],
+      "required": [
+        "name",
+        "value",
+        "unit",
+        "evidence_refs"
+      ],
       "properties": {
         "name": {
           "description": "Stable snake_case attribute name, for example screen_size or colour.",
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]{0,63}$"
         },
-        "value": { "type": ["string", "number", "boolean"] },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
         "unit": {
           "description": "Unit of measure, for example 'inch' or 'cm'; null if not applicable.",
           "$ref": "#/$defs/nullable_text"
         },
-        "evidence_refs": { "$ref": "#/$defs/evidence_refs" }
+        "evidence_refs": {
+          "$ref": "#/$defs/evidence_refs"
+        }
       }
     },
     "evidence": {
@@ -316,7 +484,10 @@
         },
         "photo_ref": {
           "description": "Ref of the supporting photo (required for photo and readable_label sources).",
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "observation": {
           "description": "Concise observation, short label excerpt or paraphrase of the user statement. No serial numbers or personal data.",
@@ -326,34 +497,63 @@
         },
         "url": {
           "description": "Source URL for external_reference evidence; otherwise null.",
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^https?://\\S+$"
         },
         "certainty": {
           "description": "Qualitative, not a calibrated probability. supported: directly backed. tentative: plausible but unconfirmed. unknown: the evidence does not settle the question.",
-          "enum": ["supported", "tentative", "unknown"]
+          "enum": [
+            "supported",
+            "tentative",
+            "unknown"
+          ]
         },
         "user_confirmation": {
           "description": "none: not addressed by the user. confirmed: the user explicitly confirmed. corrected: the user explicitly corrected an earlier value.",
-          "enum": ["none", "confirmed", "corrected"]
+          "enum": [
+            "none",
+            "confirmed",
+            "corrected"
+          ]
         }
       }
     },
     "unknown": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["field_path", "note"],
+      "required": [
+        "field_path",
+        "note"
+      ],
       "properties": {
-        "field_path": { "type": "string", "pattern": "^(/[^/]+)+$" },
-        "note": { "type": "string", "minLength": 1, "maxLength": 300 }
+        "field_path": {
+          "type": "string",
+          "pattern": "^(/[^/]+)+$"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        }
       }
     },
     "question": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "question", "field_paths"],
+      "required": [
+        "id",
+        "kind",
+        "question",
+        "field_paths"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^q_[0-9]+$" },
+        "id": {
+          "type": "string",
+          "pattern": "^q_[0-9]+$"
+        },
         "kind": {
           "enum": [
             "identity",
@@ -367,21 +567,35 @@
             "other"
           ]
         },
-        "question": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
         "field_paths": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "pattern": "^(/[^/]+)+$" }
+          "items": {
+            "type": "string",
+            "pattern": "^(/[^/]+)+$"
+          }
         }
       }
     },
     "listing_copy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "description"],
+      "required": [
+        "title",
+        "description"
+      ],
       "properties": {
-        "title": { "$ref": "#/$defs/nullable_text" },
-        "description": { "$ref": "#/$defs/nullable_text" }
+        "title": {
+          "$ref": "#/$defs/listing_title"
+        },
+        "description": {
+          "$ref": "#/$defs/listing_description"
+        }
       }
     }
   }

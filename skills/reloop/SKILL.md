@@ -4,7 +4,7 @@ description: ReLoop turns photos of a second-hand item or bundle, plus an option
 compatibility: Requires a host that can view user-supplied images. No API keys, network access or external services are needed; web browsing is optional.
 metadata:
   display-name: ReLoop
-  version: "0.1.0"
+  version: "0.2.0"
   project: photo-to-listing
 ---
 
@@ -44,9 +44,17 @@ Use these four sections, in this order, and keep the prose short:
 
 **A. Item summary**: a compact two-column table of the useful facts (item, brand/model, quantity, sale configuration, condition, function, defects, accessories, category), plus the important unknowns. Mark user-reported facts as such, for example "Funktion: working (user-reported)".
 
-**B. Listing draft**:
-- `Titel (DE)` and `Beschreibung (DE)`
-- `Title (EN)` and `Description (EN)`
+**B. Kleinanzeigen-Formular**: the listing laid out in the same order as Kleinanzeigen's "Anzeige aufgeben" form, so the user can fill it top to bottom. First comes a two-column table (`Feld | Eintrag`) with these rows:
+- `Gebot / Gesuch`: Ich biete
+- `Bilder`: the recommended upload order, cover photo first, plus any cleanup hint per photo (from `photo_upload_order`)
+- `Titel (n/65)`, with the character count
+- `Kategorie`: the suggestion, noting that Kleinanzeigen pre-selects one from the title
+- `Eigenschaften und Versand`: condition and key attributes in your own words, marked "im Formular auswählen". Versand is "selbst festlegen" unless the user stated it
+- `Beschreibung (n/4000)`: "siehe unten"
+- `Preis / Preistyp`: "selbst festlegen"
+- `Ort / Name`: "selbst ausfüllen"
+
+Then a `text` code block with the title and a `text` code block with the description, ready to copy. Then **English version** with `Title (EN)` and `Description (EN)`. The exact field map and limits are in `references/kleinanzeigen-copy.md`.
 
 **C. Clarifications**: at most three numbered questions. Ask only those that would materially change correctness. Leave this section out when nothing important is missing.
 

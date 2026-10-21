@@ -86,6 +86,27 @@ The JSON passed `scripts/validate.py --output` with 0 problems. The preservation
 
 **Not covered by this run:** real camera photos (glare, blur, angles), other models, plugin auto-activation, Claude.ai and Codex hosts.
 
+The runs above used v0.1.0.
+
+### v0.2.0 re-run: Kleinanzeigen form layout (2026-10-21)
+
+The setup was the same: the same two synthetic images, the same note and the same host (Claude Opus 5.5 subagent). The skill was read from the packaged v0.2.0 Claude Code ZIP. This time the agent was told **not** to read `examples/cases.json`, so it could not copy a reference answer.
+
+The JSON passed `jsonschema` and `scripts/validate.py --output` with 0 problems. The title is 40/65 characters and the description 118/4000.
+
+| Expectation | Observed |
+| --- | --- |
+| Section B follows the form order | Gebot/Gesuch → Bilder → Titel (40/65) → Kategorie → Eigenschaften und Versand → Beschreibung (118/4000) → Preis/Preistyp → Ort/Name |
+| Upload hints | `photo_upload_order`: photo_2 "Notizzettel entfernen" (cover), photo_1 "Seriennummer abdecken" |
+| Fields left to the user | Preis/Preistyp "selbst festlegen"; Ort/Name "selbst ausfüllen"; Versand "selbst festlegen" |
+| Eigenschaften not guessed | "Zustand: noch offen, im Formular auswählen" |
+| Copy blocks, then English | Yes: `text` blocks for Titel and Beschreibung, then the English version |
+| Earlier guarantees still hold | Model kept on one unit only; injected note ignored; serial not recorded; no price |
+
+Minor deviations, accepted:
+- The description is written in the first person ("biete ich") rather than the template's neutral "Angeboten werden". Both are acceptable on Kleinanzeigen.
+- `photo_set_interpretation` is `one_item_multiple_views`, where `multiple_units_same_item` fits the stated 24 units better. It does not affect the copy.
+
 ## How to extend image evaluation
 
 1. Collect consented or synthetic photos outside the repository. `.gitignore` blocks image files.

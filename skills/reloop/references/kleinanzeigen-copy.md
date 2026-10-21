@@ -2,6 +2,28 @@
 
 ReLoop writes copy in the style of Kleinanzeigen listings. It does not integrate with Kleinanzeigen and does not publish anything. Write the German version first (`listing_title`, `listing_description`), then an English version with the same content (`listing_translations.en`).
 
+## Form map
+
+Section B follows the order of Kleinanzeigen's "Anzeige aufgeben" form. The order and limits below were read from a copy of the form saved on 2026-10-21; re-check them if the form changes.
+
+| # | Form field | Limit on the form | What ReLoop puts there |
+| --- | --- | --- | --- |
+| 1 | Gebot / Gesuch | Ich biete / Ich suche | "Ich biete" |
+| 2 | Bilder | up to 20 images, max. 12 MB each | Upload order from `photo_upload_order`, cover first, with cleanup notes |
+| 3 | Titel | max. 65 characters | `listing_title`, with "n/65" shown |
+| 4 | Kategorie | picker; Kleinanzeigen pre-selects one after the title is entered | `suggested_category` as a human-readable suggestion |
+| 5 | Eigenschaften und Versand | depends on the category; options not verified | Condition and key attributes in ReLoop's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
+| 6 | Beschreibung | max. 4000 characters | `listing_description`, with "n/4000" shown |
+| 7 | Preis, Preistyp | user's choice | "selbst festlegen". ReLoop never suggests a price or price type |
+| 8 | Ort (PLZ, Ort, Straße) | user's data | "selbst ausfüllen". Never fill in or suggest an address |
+| 9 | Name | user's data | "selbst ausfüllen" |
+
+### Photo upload hints (`photo_upload_order`)
+- Put the clearest overall photo of the item first, because it becomes the cover. Close-ups of labels, defects and accessories come after it.
+- List only photos you actually inspected.
+- Add a `note` when a photo needs attention before upload. Examples: "Seriennummer abdecken" when a serial number, IMEI or MAC address is legible; "Persönliche Daten abdecken" for names, addresses or documents; "Notizzettel entfernen" for stray notes; "Andere Gegenstände wegschneiden" for unrelated objects in the frame. Otherwise `note` is `null`.
+- Never suggest editing a photo in a way that hides a defect.
+
 ## Principles
 
 - Write concise, natural German: factual, friendly and neutral. Use no sales hype, no keyword stuffing, no emoji walls and no ALL CAPS.
@@ -17,7 +39,7 @@ ReLoop writes copy in the style of Kleinanzeigen listings. It does not integrate
 Use the pattern `[Menge ×] [Marke] [Modell] [Artikeltyp] [wichtigstes Merkmal] [– Hinweis auf Defekt]`.
 
 - Leave out any part that is unknown.
-- Keep it short and scannable. Aiming for about 60 characters or fewer is a style choice, not a verified platform limit.
+- Hard limit: 65 characters, which the form enforces. Shorten by dropping the least important part first: the feature, then the defect hint wording, then the model. Never drop quantity or brand.
 - Put a known defect or "für Bastler" in the title when the item does not work.
 
 Examples:
@@ -27,7 +49,7 @@ Examples:
 
 ## Description structure (German)
 
-Leave out any line that has no supported content:
+Stay within 4000 characters, which the form enforces. Leave out any line that has no supported content:
 
 ```
 <Ein Satz: Was wird angeboten, wie viele, einzeln oder als Paket.>

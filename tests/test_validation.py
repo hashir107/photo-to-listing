@@ -106,6 +106,23 @@ class SchemaNegatives(unittest.TestCase):
         self.doc["evidence"][0]["certainty"] = "0.9"
         self.assertTrue(self.schema_errors(self.doc))
 
+    def test_title_over_kleinanzeigen_limit_rejected(self):
+        self.doc["listing_title"] = "x" * 65
+        self.assertEqual(self.schema_errors(self.doc), [])
+        self.doc["listing_title"] = "x" * 66
+        self.assertTrue(any("longer than 65" in e for e in self.schema_errors(self.doc)))
+        self.doc["listing_title"] = "ok"
+        self.doc["listing_translations"]["en"]["title"] = "x" * 66
+        self.assertTrue(self.schema_errors(self.doc))
+
+    def test_description_over_kleinanzeigen_limit_rejected(self):
+        self.doc["listing_description"] = "x" * 4001
+        self.assertTrue(any("longer than 4000" in e for e in self.schema_errors(self.doc)))
+
+    def test_more_than_twenty_upload_photos_rejected(self):
+        self.doc["photo_upload_order"] = [{"ref": f"photo_{i}", "note": None} for i in range(21)]
+        self.assertTrue(any("more than 20" in e for e in self.schema_errors(self.doc)))
+
 
 class RuleNegatives(unittest.TestCase):
     """Integrity rules beyond JSON Schema (see references/extraction-rules.md)."""
@@ -174,6 +191,21 @@ class RuleNegatives(unittest.TestCase):
         errors = self.errors()
         self.assertTrue(any("hype" in e for e in errors))
         self.assertTrue(any("warranty" in e for e in errors))
+
+    def test_upload_order_needs_inspected_known_photos(self):
+        self.doc["photo_upload_order"].append({"ref": "photo_9", "note": None})
+        self.assertTrue(any("photo_9 is not an inspected photo" in e for e in self.errors()))
+        self.doc["photo_upload_order"].pop()
+        self.doc["photos"][2]["inspected"] = False
+        self.assertTrue(any("photo_3 is not an inspected photo" in e for e in self.errors()))
+
+    def test_upload_order_rejects_duplicates(self):
+        self.doc["photo_upload_order"].append(dict(self.doc["photo_upload_order"][0]))
+        self.assertTrue(any("more than once" in e for e in self.errors()))
+
+    def test_upload_note_must_not_carry_price(self):
+        self.doc["photo_upload_order"][0]["note"] = "Preis 50 € aufs Foto schreiben"
+        self.assertTrue(any("photo_upload_order note" in e for e in self.errors()))
 
     def test_listing_languages_must_match_nullness(self):
         self.doc["listing_translations"]["en"]["title"] = None

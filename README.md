@@ -9,7 +9,7 @@
 
 You can answer the questions over later turns. The result is updated in place, and confirmed facts and corrections are kept.
 
-> Version 0.1.0. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+> Version 0.2.0. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
 
 ## What it does and does not do
 
@@ -34,7 +34,7 @@ Kleinanzeigen is the target writing style, not an integration. There is no backe
 ```
 skills/reloop/              The one authoritative skill (shipped in every package)
   SKILL.md                  Activation description and workflow
-  schema.json               JSON Schema 2020-12, schema_version 0.1.0
+  schema.json               JSON Schema 2020-12, schema_version 0.2.0
   references/               Extraction rules; listing-copy rules
   examples/cases.json       9 worked examples / behavioural fixtures
 packaging/claude-code/      Claude Code plugin + marketplace manifests, install notes
@@ -51,32 +51,32 @@ docs/evaluation.md          What has and has not been tested, and how
 
 Build the packages (see [Build and validate](#build-and-validate)) or download them from a CI run. Each package is built from `skills/reloop/`.
 
-### Claude (claude.ai or desktop app): `photo-to-listing-skill-v0.1.0.zip`
+### Claude (claude.ai or desktop app): `photo-to-listing-skill-v0.2.0.zip`
 
-1. Go to **Customize > Skills** and upload `photo-to-listing-skill-v0.1.0.zip`. The ZIP's top-level folder is `reloop/`, as Anthropic's packaging guide requires.
+1. Go to **Customize > Skills** and upload `photo-to-listing-skill-v0.2.0.zip`. The ZIP's top-level folder is `reloop/`, as Anthropic's packaging guide requires.
 2. Turn the skill on. Custom skills on claude.ai need a plan with Skills support and code execution enabled; see [compatibility](docs/compatibility.md).
 
-### Claude Code: `photo-to-listing-claude-code-v0.1.0.zip`
+### Claude Code: `photo-to-listing-claude-code-v0.2.0.zip`
 
 ```bash
-unzip photo-to-listing-claude-code-v0.1.0.zip
-claude plugin marketplace add ./photo-to-listing-claude-code-v0.1.0
+unzip photo-to-listing-claude-code-v0.2.0.zip
+claude plugin marketplace add ./photo-to-listing-claude-code-v0.2.0
 claude plugin install photo-to-listing@photo-to-listing-local
 ```
 
-To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.1.0/plugins/photo-to-listing`. To invoke it explicitly, use `/photo-to-listing:reloop`. The package's `INSTALL.md` has details.
+To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.2.0/plugins/photo-to-listing`. To invoke it explicitly, use `/photo-to-listing:reloop`. The package's `INSTALL.md` has details.
 
-### Codex: `photo-to-listing-codex-v0.1.0.zip`
+### Codex: `photo-to-listing-codex-v0.2.0.zip`
 
 ```bash
-unzip photo-to-listing-codex-v0.1.0.zip
-codex plugin marketplace add ./photo-to-listing-codex-v0.1.0
+unzip photo-to-listing-codex-v0.2.0.zip
+codex plugin marketplace add ./photo-to-listing-codex-v0.2.0
 ```
 
 Then install **ReLoop** from the **photo-to-listing (local)** marketplace in the Plugins Directory of Codex in the ChatGPT desktop app. If you want the skill only, without the plugin:
 
 ```bash
-cp -R photo-to-listing-codex-v0.1.0/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
+cp -R photo-to-listing-codex-v0.2.0/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
 ```
 
 Invoke it with `$reloop` or pick it from `/skills`. The package's `INSTALL.md` has details.
@@ -105,11 +105,31 @@ Input: photos of several monitors, plus a close-up of one rear label, plus the n
 | Condition | Not assessed for the whole batch; a scratch on one bezel |
 | Function | Unknown (screens off) |
 
-**B. Listing draft**
+**B. Kleinanzeigen-Formular**: the rows follow the "Anzeige aufgeben" form from top to bottom.
 
-- **Titel (DE):** 24 × LG Computermonitore (Büroauflösung)
-- **Beschreibung (DE):** Angeboten werden 24 Computermonitore von LG aus einer Büroauflösung. Zustand: Gebraucht … (the full text is in the JSON below)
-- **Title (EN):** 24 × LG computer monitors (office clearance)
+| Feld | Eintrag |
+| --- | --- |
+| Gebot / Gesuch | Ich biete |
+| Bilder | 1. photo_1 (Titelbild) · 2. photo_3 · 3. photo_2: Seriennummer abdecken |
+| Titel (40/65) | 24 × LG Computermonitore (Büroauflösung) |
+| Kategorie | Elektronik > Monitore (Vorschlag; Kleinanzeigen wählt nach dem Titel automatisch vor) |
+| Eigenschaften und Versand | Zustand: gebraucht, Gebrauchsspuren (im Formular auswählen) · Versand: selbst festlegen |
+| Beschreibung (n/4000) | siehe unten |
+| Preis / Preistyp | selbst festlegen |
+| Ort / Name | selbst ausfüllen |
+
+```text
+24 × LG Computermonitore (Büroauflösung)
+```
+
+```text
+Angeboten werden 24 Computermonitore von LG aus einer Büroauflösung.
+
+Zustand: Gebraucht. Auf den Fotos sind Gebrauchsspuren zu sehen, z. B. ein kurzer Kratzer am unteren Rahmen eines Monitors.
+…
+```
+
+English version: **24 × LG computer monitors (office clearance)**, with the matching description.
 
 **C. Clarifications**
 
@@ -129,7 +149,7 @@ Requires Python 3.9 or later and nothing else.
 
 ```bash
 python3 scripts/validate.py                    # SKILL.md, schema, examples, packaging, version, secrets
-python3 -m unittest discover -s tests          # 46 unit tests including negative cases
+python3 -m unittest discover -s tests          # 52 unit tests including negative cases
 python3 scripts/build_releases.py              # validate, build dist/*.zip + SHA256SUMS.txt, verify archives
 python3 scripts/validate.py --dist dist        # re-verify existing archives
 python3 scripts/validate.py --output out.json  # check one real model answer against schema and rules
@@ -140,7 +160,7 @@ Optional cross-checks, also run in CI:
 ```bash
 pip install jsonschema "skills-ref @ git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref"
 python3 scripts/validate.py --external
-claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.1.0   # if Claude Code is installed
+claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.2.0   # if Claude Code is installed
 ```
 
 The build is reproducible: identical sources give byte-identical ZIPs. The workflow in `.github/workflows/validate.yml` validates, tests, builds and uploads the packages as workflow artifacts. It never publishes a release.

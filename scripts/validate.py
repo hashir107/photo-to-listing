@@ -288,6 +288,17 @@ def semantic_errors(doc):
     if inspected and doc.get("photo_set_interpretation") == "no_inspectable_photos":
         errors.append("photo_set_interpretation says no_inspectable_photos but a photo was inspected")
 
+    upload_refs = [u["ref"] for u in doc.get("photo_upload_order", [])]
+    if len(upload_refs) != len(set(upload_refs)):
+        errors.append("photo_upload_order lists a photo more than once")
+    for ref in upload_refs:
+        if ref not in inspected:
+            errors.append(f"photo_upload_order: {ref} is not an inspected photo")
+    for u in doc.get("photo_upload_order", []):
+        for pattern, why in LISTING_FORBIDDEN:
+            if u["note"] and pattern.search(u["note"]) and why != "serial identifier":
+                errors.append(f"photo_upload_order note for {u['ref']} contains a {why}")
+
     en = doc.get("listing_translations", {}).get("en", {})
     nullness = {doc.get("listing_title") is None, doc.get("listing_description") is None,
                 en.get("title") is None, en.get("description") is None}
@@ -453,6 +464,16 @@ def check_packaging():
 
 
 def iter_repo_files():
+    # In a git checkout, scan what could be committed (tracked + untracked, minus .gitignore'd).
+    if (ROOT / ".git").exists() and shutil.which("git"):
+        proc = subprocess.run(["git", "ls-files", "-co", "--exclude-standard", "-z"],
+                              cwd=ROOT, capture_output=True, text=True)
+        if proc.returncode == 0:
+            for name in sorted(filter(None, proc.stdout.split("\0"))):
+                path = ROOT / name
+                if path.is_file():
+                    yield path, Path(name)
+            return
     for path in sorted(ROOT.rglob("*")):
         rel = path.relative_to(ROOT)
         if any(part in SCAN_SKIP_DIRS for part in rel.parts):
