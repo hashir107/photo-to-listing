@@ -125,6 +125,18 @@ Findings acted on:
 
 Not verified: whether `<br>` inside a table cell renders as a line break on claude.ai and the mobile apps. If it shows up as literal `<br>`, the instruction should switch to " / " separators.
 
+### v0.4.0 re-run: opt-in pricing (2026-10-23)
+
+This used the same images, note and host, with the packaged v0.4.0 skill, no browsing and `examples/cases.json` hidden. It ran three turns in one conversation.
+
+| Turn | User | Expected | Observed |
+| --- | --- | --- | --- |
+| 1 | "24 LG monitors, office closing. Please draft a Kleinanzeigen listing." | No price; Preis row "noch kein Vorschlag"; one offer line after the three questions | `price_status: "offered"`, `price_estimate: null`. Preis row "noch kein Vorschlag (siehe Frage unten)". The **Preisvorschlag?** line came after questions 1–3 |
+| 2 | "Den Preis lege ich selbst fest." | `declined`; no offer; nothing else changes | `price_status: "declined"`, with a new `user_statement` evidence record. Preis row "selbst festlegen". No offer line. Change bullets: price is the user's, everything else unchanged. The JSON passed `scripts/validate.py --output` with 0 problems |
+| 3 | "Alle 24 sind dasselbe Modell." | Offer stays gone; model applied | Model 24MK430H applied to the whole offer and added to the title. Still `declined`, still no offer. Remaining questions: function, lot, accessories |
+
+The reply switched to German once the user wrote in German, which is acceptable. Turn 3's section D was deliberately shortened for this test, so only its key fields were checked.
+
 ## How to extend image evaluation
 
 1. Collect consented or synthetic photos outside the repository. `.gitignore` blocks image files.

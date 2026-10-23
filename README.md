@@ -3,13 +3,13 @@
 **ReLoop** is an [Agent Skill](https://agentskills.io/specification) for second-hand items. It turns photos of an item or bundle, plus an optional one-line note, into four things:
 
 - a compact item summary,
-- a Kleinanzeigen form table: German title and description, category, condition hints and a price suggestion, followed by the English version,
+- a Kleinanzeigen form table: German title and description, category and condition hints, followed by the English version, plus an optional price suggestion if you want one,
 - up to three targeted clarification questions, and
 - structured JSON metadata that validates against a versioned schema.
 
 You can answer the questions over later turns. The result is updated in place, and confirmed facts and corrections are kept.
 
-> Version 0.3.0. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+> Version 0.4.0. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
 
 ## What it does and does not do
 
@@ -19,7 +19,7 @@ You can answer the questions over later turns. The result is updated in place, a
 | Separating what was seen, what the user said, external sources and inferences | Inventory, saved collections or a database |
 | Condition kept separate from function, plus defects and accessories | Keep/sell/give-away decisions and selling status |
 | German and English listing copy for you to paste into Kleinanzeigen | Logging in to or publishing on any marketplace |
-| Price suggestions with a stated basis (your comparables, a cited new price or a labelled fallback) | Buyer messaging, payments, shipping, cloud sync |
+| Optional price suggestions on request, with a stated basis (your comparables, a cited new price or a labelled fallback) | Buyer messaging, payments, shipping, cloud sync |
 | Multi-turn clarification | |
 
 Kleinanzeigen is the target writing style, not an integration. There is no backend, MCP server or external API. Basic use needs no API keys.
@@ -28,14 +28,14 @@ Kleinanzeigen is the target writing style, not an integration. There is no backe
 
 - An assistant that can view the images you attach: Claude (claude.ai or the desktop app), Claude Code or Codex, used with a vision-capable model.
 - If the host cannot view images, ReLoop says so and asks you to re-attach them. It never pretends to have inspected a photo.
-- Web browsing is optional. It is used when you ask, when a material identification question needs checking, or to look up a current new price for the price suggestion.
+- Web browsing is optional. It is used when you ask, when a material identification question needs checking, or, if you allow it, to look up a current new price for a price suggestion.
 
 ## Repository layout
 
 ```
 skills/reloop/              The one authoritative skill (shipped in every package)
   SKILL.md                  Activation description and workflow
-  schema.json               JSON Schema 2020-12, schema_version 0.3.0
+  schema.json               JSON Schema 2020-12, schema_version 0.4.0
   references/               Extraction rules; listing-copy rules
   examples/cases.json       9 worked examples / behavioural fixtures
 packaging/claude-code/      Claude Code plugin + marketplace manifests, install notes
@@ -52,32 +52,32 @@ docs/evaluation.md          What has and has not been tested, and how
 
 Build the packages (see [Build and validate](#build-and-validate)) or download them from a CI run. Each package is built from `skills/reloop/`.
 
-### Claude (claude.ai or desktop app): `photo-to-listing-skill-v0.3.0.zip`
+### Claude (claude.ai or desktop app): `photo-to-listing-skill-v0.4.0.zip`
 
-1. Go to **Customize > Skills** and upload `photo-to-listing-skill-v0.3.0.zip`. The ZIP's top-level folder is `reloop/`, as Anthropic's packaging guide requires.
+1. Go to **Customize > Skills** and upload `photo-to-listing-skill-v0.4.0.zip`. The ZIP's top-level folder is `reloop/`, as Anthropic's packaging guide requires.
 2. Turn the skill on. Custom skills on claude.ai need a plan with Skills support and code execution enabled; see [compatibility](docs/compatibility.md).
 
-### Claude Code: `photo-to-listing-claude-code-v0.3.0.zip`
+### Claude Code: `photo-to-listing-claude-code-v0.4.0.zip`
 
 ```bash
-unzip photo-to-listing-claude-code-v0.3.0.zip
-claude plugin marketplace add ./photo-to-listing-claude-code-v0.3.0
+unzip photo-to-listing-claude-code-v0.4.0.zip
+claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.0
 claude plugin install photo-to-listing@photo-to-listing-local
 ```
 
-To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.3.0/plugins/photo-to-listing`. To invoke it explicitly, use `/photo-to-listing:reloop`. The package's `INSTALL.md` has details.
+To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.0/plugins/photo-to-listing`. To invoke it explicitly, use `/photo-to-listing:reloop`. The package's `INSTALL.md` has details.
 
-### Codex: `photo-to-listing-codex-v0.3.0.zip`
+### Codex: `photo-to-listing-codex-v0.4.0.zip`
 
 ```bash
-unzip photo-to-listing-codex-v0.3.0.zip
-codex plugin marketplace add ./photo-to-listing-codex-v0.3.0
+unzip photo-to-listing-codex-v0.4.0.zip
+codex plugin marketplace add ./photo-to-listing-codex-v0.4.0
 ```
 
 Then install **ReLoop** from the **photo-to-listing (local)** marketplace in the Plugins Directory of Codex in the ChatGPT desktop app. If you want the skill only, without the plugin:
 
 ```bash
-cp -R photo-to-listing-codex-v0.3.0/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
+cp -R photo-to-listing-codex-v0.4.0/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
 ```
 
 Invoke it with `$reloop` or pick it from `/skills`. The package's `INSTALL.md` has details.
@@ -116,13 +116,17 @@ Input: photos of several monitors, plus a close-up of one rear label, plus the n
 | Kategorie | Elektronik > Monitore (Vorschlag; Kleinanzeigen wählt nach dem Titel automatisch vor) |
 | Eigenschaften und Versand | Zustand: gebraucht, Gebrauchsspuren (im Formular auswählen) · Versand: selbst festlegen |
 | Beschreibung (293/4000) | Angeboten werden 24 Computermonitore von LG aus einer Büroauflösung.<br><br>Zustand: Gebraucht. Auf den Fotos sind Gebrauchsspuren zu sehen, z. B. ein kurzer Kratzer am unteren Rahmen eines Monitors.<br>… |
-| Preis (Vorschlag) | 35 € pro Stück (Spanne 25–50 €), als Paket ca. 630 € · Basis: ungeprüft (Modellwissen), Funktion ungeprüft · Preistyp selbst wählen |
+| Preis | noch kein Vorschlag (siehe Frage unten) |
 | Title (EN) | 24 × LG computer monitors (office clearance) |
 | Description (EN) | 24 LG computer monitors from an office clearance.<br><br>Condition: Used. … |
 
-### How prices are estimated
+### Price suggestions (optional)
 
-ReLoop states the basis of every price suggestion and uses the best basis available, in this order (see [`references/pricing.md`](skills/reloop/references/pricing.md)):
+ReLoop does not estimate a price unless you want one. The first answer ends with a one-line offer:
+
+> **Preisvorschlag?** Vergleichsanzeigen mit Preisen einfügen, die Websuche erlauben, oder den Preis selbst festlegen?
+
+To get a price, paste comparable prices or say the web search is OK. Reply "mache ich selbst" and it will not ask again. When you opt in, ReLoop states the basis of the price and uses the best basis available, in this order (see [`references/pricing.md`](skills/reloop/references/pricing.md)):
 
 1. **Your comparables.** Paste 2–5 prices of similar Kleinanzeigen listings, for example "Ähnliche Anzeigen: 45 €, 50 €, 60 €". ReLoop takes the median and adjusts it for condition, function and quantity. This is the most accurate basis for Kleinanzeigen.
 2. **A cited new price.** With web search, ReLoop looks up the current new price from a manufacturer, retailer or price-comparison page, cites the URL, and applies documented depreciation bands.
@@ -136,6 +140,8 @@ ReLoop never fetches or scrapes Kleinanzeigen or eBay pages, and never puts the 
 2. Have the monitors been tested? Do all of them power on?
 3. Do you want to sell all 24 as one lot, or individually?
 
+**Preisvorschlag?** Vergleichsanzeigen mit Preisen einfügen, die Websuche erlauben, oder den Preis selbst festlegen?
+
 **D. Structured metadata**: JSON with `evidence` records such as `{"field_path": "/units/0/model", "source": "readable_label", "photo_ref": "photo_2", "certainty": "supported"}`.
 
 Follow-up example: you reply "All the same model, all tested and working, sold as one lot." ReLoop then sets `model`, `functional_status: "working"` (user-reported) and `sale_configuration: "bundle"`, notes what changed, and returns the revised listing.
@@ -148,7 +154,7 @@ Requires Python 3.9 or later and nothing else.
 
 ```bash
 python3 scripts/validate.py                    # SKILL.md, schema, examples, packaging, version, secrets
-python3 -m unittest discover -s tests          # 59 unit tests including negative cases
+python3 -m unittest discover -s tests          # 63 unit tests including negative cases
 python3 scripts/build_releases.py              # validate, build dist/*.zip + SHA256SUMS.txt, verify archives
 python3 scripts/validate.py --dist dist        # re-verify existing archives
 python3 scripts/validate.py --output out.json  # check one real model answer against schema and rules
@@ -159,7 +165,7 @@ Optional cross-checks, also run in CI:
 ```bash
 pip install jsonschema "skills-ref @ git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref"
 python3 scripts/validate.py --external
-claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.3.0   # if Claude Code is installed
+claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.4.0   # if Claude Code is installed
 ```
 
 The build is reproducible: identical sources give byte-identical ZIPs. The workflow in `.github/workflows/validate.yml` validates, tests, builds and uploads the packages as workflow artifacts. It never publishes a release.

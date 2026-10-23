@@ -1,6 +1,24 @@
 # Price suggestions
 
-ReLoop suggests a price range for the Kleinanzeigen "Preis" field. A suggestion is only as good as its basis, so every price states where it came from. The user decides the final price and the Preistyp (Festpreis or VB).
+ReLoop can suggest a price range for the Kleinanzeigen "Preis" field, but only when the user wants one. A suggestion is only as good as its basis, so every price states where it came from. The user decides the final price and the Preistyp (Festpreis or VB).
+
+## 0. Opt-in (`price_status`)
+
+Do not estimate a price by default. Track the user's choice in `price_status`:
+
+| `price_status` | When | `price_estimate` | Preis row in section B |
+| --- | --- | --- | --- |
+| `offered` | Default when the item type is known and the user has not chosen yet. Ask once, at the end of section C: **Preisvorschlag?** Vergleichsanzeigen mit Preisen einfügen, die Websuche erlauben, oder den Preis selbst festlegen? | `null` | "noch kein Vorschlag (siehe Frage unten)" |
+| `estimated` | The user pasted comparable prices, allowed web search, asked for an estimate, or already did one of these in the first message | the estimate (sections 1–5) | the price with its basis |
+| `declined` | The user says they will set the price themselves, e.g. "mache ich selbst" or "I'll add it myself" | `null` | "selbst festlegen" |
+| `not_applicable` | No price is possible yet: item type unknown, nothing inspectable, or a regulated item (section 5) | `null` | "kein Vorschlag" and the reason |
+
+Rules:
+- The offer is not one of the three clarification questions, and it never displaces them.
+- A pricing choice persists across turns. After `declined`, never offer or estimate again unless the user asks.
+- If the user ignores the offer, leave it `offered` and keep the one-line offer. Do not escalate or nag.
+- **Web search allowed** means the user agreed to a lookup. Only search if the host can, and follow the rules in section 6. If nothing usable is found or the host cannot browse, say so and give the labelled `model_knowledge` range.
+- When the status moves from `offered` to `estimated`, mention it in the change bullets.
 
 ## 1. Basis, in order of preference
 

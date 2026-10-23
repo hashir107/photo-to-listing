@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-10-23
+
+### Changed
+- **Price suggestions are now opt-in.** By default ReLoop estimates no price. The Preis row reads
+  "noch kein Vorschlag", and section C ends with one extra offer line, outside the three questions:
+  paste comparable listings, allow a web search, or set the price yourself. If you decline,
+  the offer is never repeated. Pasting comparable prices in the first message counts as opting in.
+- Schema 0.4.0 adds the required `price_status` field: `offered`, `estimated`, `declined`
+  or `not_applicable`. `price_estimate` is set only when the status is `estimated`.
+
+### Added
+- `references/pricing.md` §0 documents the opt-in states and how to handle each reply.
+- New fixture `price-declined` (2 turns), plus validator rules and tests (63 tests in total)
+  for the status and estimate consistency.
+
 ## [0.3.0] - 2026-10-21
 
 ### Added

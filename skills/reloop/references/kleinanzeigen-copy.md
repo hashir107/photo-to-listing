@@ -12,7 +12,7 @@ Section B is one table in the order of Kleinanzeigen's "Anzeige aufgeben" form, 
 | `Kategorie` | picker; Kleinanzeigen pre-selects one after the title is entered | `suggested_category` as a human-readable suggestion |
 | `Eigenschaften und Versand` | depends on the category; options not verified | Condition and key attributes in ReLoop's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
 | `Beschreibung (n/4000)` | max. 4000 characters | the full `listing_description`, with each line break written as `<br>` inside the cell |
-| `Preis (Vorschlag)` | price in whole euros; Preistyp (e.g. Festpreis) | the `price_estimate` range and basis, following `references/pricing.md`. Preistyp: "selbst wählen" |
+| `Preis` | price in whole euros; Preistyp (e.g. Festpreis) | depends on `price_status` (opt-in): an offer, "selbst festlegen", or the `price_estimate` range and basis, following `references/pricing.md`. Preistyp: "selbst wählen" |
 | `Title (EN)` | not part of the form | `listing_translations.en.title` |
 | `Description (EN)` | not part of the form | `listing_translations.en.description`, with `<br>` line breaks |
 

@@ -183,36 +183,71 @@ class RuleNegatives(unittest.TestCase):
                                      "observation": "Price basis.", "url": url, "certainty": certainty,
                                      "user_confirmation": "none"})
 
+    def estimate(self):
+        """Opt the monitor doc in to a valid model-knowledge price."""
+        self.price_ev("ev_19", "inference", "tentative")
+        self.doc["price_status"] = "estimated"
+        self.doc["price_estimate"] = {"currency": "EUR", "scope": "per_unit", "low": 25, "high": 50, "suggested": 35,
+                                      "lot_total_suggested": 630, "basis": "model_knowledge",
+                                      "assumptions": ["Ungeprüft."], "evidence_refs": ["ev_19"]}
+        self.assertEqual(self.errors(), [])
+
+    def test_offered_by_default_without_price(self):
+        self.assertEqual(self.doc["price_status"], "offered")
+        self.assertIsNone(self.doc["price_estimate"])
+
+    def test_price_only_when_estimated(self):
+        self.estimate()
+        for status in ("offered", "declined", "not_applicable"):
+            self.doc["price_status"] = status
+            self.assertTrue(any("exactly when price_status" in e for e in self.errors()), status)
+
+    def test_estimated_status_needs_a_price(self):
+        self.doc["price_status"] = "estimated"
+        self.assertTrue(any("exactly when price_status" in e for e in self.errors()))
+
+    def test_unknown_price_status_rejected(self):
+        self.doc["price_status"] = "maybe"
+        self.assertTrue(minischema.validate(self.doc, validate.load_schema()))
+
     def test_price_range_must_be_ordered(self):
+        self.estimate()
         self.doc["price_estimate"]["low"] = 60
         self.assertTrue(any("low <= suggested <= high" in e for e in self.errors()))
 
     def test_reference_new_price_needs_cited_url(self):
+        self.estimate()
         self.price_ev("ev_20", "inference", "tentative")
         self.doc["price_estimate"].update(basis="reference_new_price", evidence_refs=["ev_20"])
         self.assertTrue(any("external_reference evidence with a URL" in e for e in self.errors()))
 
     def test_reference_new_price_with_cited_url_is_valid(self):
+        self.estimate()
         self.price_ev("ev_20", "external_reference", "supported", url="https://example.com/lg-24mk430h")
         self.doc["price_estimate"].update(basis="reference_new_price", evidence_refs=["ev_20"])
         self.assertEqual(self.errors(), [])
         self.assertEqual(minischema.validate(self.doc, validate.load_schema()), [])
 
     def test_model_knowledge_must_be_tentative(self):
+        self.estimate()
         ref = self.doc["price_estimate"]["evidence_refs"][0]
         next(e for e in self.doc["evidence"] if e["id"] == ref)["certainty"] = "supported"
         self.assertTrue(any("tentative inference" in e for e in self.errors()))
 
     def test_user_comparables_need_user_statement(self):
+        self.estimate()
         self.doc["price_estimate"]["basis"] = "user_comparables"
         self.assertTrue(any("user_statement" in e for e in self.errors()))
 
     def test_no_price_without_item_type(self):
         self.doc["item_type"] = None
         self.doc["evidence"] = [e for e in self.doc["evidence"] if e["field_path"] != "/item_type"]
-        self.assertTrue(any("item_type is unknown" in e for e in self.errors()))
+        self.assertTrue(any("'not_applicable' while item_type is unknown" in e for e in self.errors()))
+        self.doc["price_status"] = "not_applicable"
+        self.assertFalse(any("item_type" in e for e in self.errors()))
 
     def test_price_schema_rejects_other_currency_and_negative(self):
+        self.estimate()
         schema = validate.load_schema()
         self.doc["price_estimate"]["currency"] = "USD"
         self.assertTrue(minischema.validate(self.doc, schema))

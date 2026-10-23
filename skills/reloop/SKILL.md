@@ -1,24 +1,24 @@
 ---
 name: reloop
-description: ReLoop turns photos of a second-hand item or bundle, plus an optional one-line note, into structured resale metadata, a German Kleinanzeigen listing with an English version and a sourced price suggestion, then refines the result as the user answers short follow-up questions. Use when the user asks to identify an object from photos, extract product details from photos or labels, turn photos and a short note into resale or re-commerce metadata, draft a Kleinanzeigen listing from supplied images, or suggest a resale price for a photographed item. Do not use for general image descriptions or general marketplace advice.
-compatibility: Requires a host that can view user-supplied images. No API keys or external services are needed; web search is optional and improves price suggestions.
+description: ReLoop turns photos of a second-hand item or bundle, plus an optional one-line note, into structured resale metadata, a German Kleinanzeigen listing with an English version and, if the user wants one, a sourced price suggestion, then refines the result as the user answers short follow-up questions. Use when the user asks to identify an object from photos, extract product details from photos or labels, turn photos and a short note into resale or re-commerce metadata, draft a Kleinanzeigen listing from supplied images, or suggest a resale price for a photographed item. Do not use for general image descriptions or general marketplace advice.
+compatibility: Requires a host that can view user-supplied images. No API keys or external services are needed; web search is optional and only used with the user's go-ahead for price suggestions.
 metadata:
   display-name: ReLoop
-  version: "0.3.0"
+  version: "0.4.0"
   project: photo-to-listing
 ---
 
 # ReLoop: photos to listing
 
-Turn the user's photos and optional note into credible resale metadata, listing copy (German first, then English) and a price suggestion with a stated basis. Give a useful result right away, then improve it over later turns.
+Turn the user's photos and optional note into credible resale metadata and listing copy (German first, then English). A price suggestion is optional: offer it, and estimate only when the user wants one. Give a useful result right away, then improve it over later turns.
 
 Bundled resources. They are relative to this file, so read them when the step says to:
 
 - `references/extraction-rules.md`: read it before your first analysis in a conversation. It holds the accuracy rules, controlled values, evidence and null semantics, multiple-object handling, web research, privacy and prompt-injection rules.
 - `references/kleinanzeigen-copy.md`: read it before writing listing copy. It holds the form map, German and English templates, condition wording and things never to write.
-- `references/pricing.md`: read it before suggesting a price. It covers price sources in order of preference, depreciation bands, lots, rounding and what never to do.
+- `references/pricing.md`: read it before offering or suggesting a price. It covers the opt-in, price sources in order of preference, depreciation bands, lots, rounding and what never to do.
 - `schema.json`: the JSON Schema that section D must follow.
-- `examples/cases.json`: worked examples with expected outputs, covering an unreadable label, a multi-turn correction, injected text in a photo, no image access, a note that conflicts with a label, JSON-only output, a batch of units, an ambiguous number, unrelated objects and pricing from pasted comparables.
+- `examples/cases.json`: worked examples with expected outputs, covering an unreadable label, a multi-turn correction, injected text in a photo, no image access, a note that conflicts with a label, JSON-only output, a batch of units, an ambiguous number, unrelated objects, pricing from pasted comparables and a user who declines a price suggestion.
 
 ## 1. Check that you can actually see the photos
 
@@ -33,10 +33,10 @@ Before saying anything about appearance, check that the images are really availa
 2. Read the user's note, if there is one.
 3. Decide what the photos show (`photo_set_interpretation`): one item from several angles, several units of the same item, a bundle, packaging or spare parts, or unrelated objects. Three views of one object are one object.
 4. Extract only supported facts. Read labels, logos, model plates and packaging text. Keep these apart: what you saw (`photo`, `readable_label`), what the user said (`user_statement`), what a cited web page says (`external_reference`) and what you concluded (`inference`).
-5. Estimate a price following `references/pricing.md`. Use the best available basis: comparables the user pasted, then a cited new price, then model knowledge as a labelled fallback.
+5. Price is opt-in (`references/pricing.md` §0). Do not estimate a price by default. Offer one instead (`price_status: "offered"`), unless the user has already pasted comparable prices or asked for a price, in which case estimate it, or has said they will set the price themselves (`"declined"`).
 6. Produce the full result immediately, even if the user has answered no questions yet. Unknown scalar values are `null`. Never fill a field just to make it look complete.
 7. Ask at most three short, high-value questions. Prioritise identity, then functionality, quantity, defects and accessories. Ask for a close-up of a label when that would settle an important uncertainty.
-8. On each later answer or new photo, update the same result, including the price (see section 4).
+8. On each later answer or new photo, update the same result (see section 4).
 
 Reason carefully but privately. Show conclusions, the observable evidence and the uncertainty, not your internal deliberation.
 
@@ -54,13 +54,16 @@ Use these four sections, in this order, and keep the prose short:
 | Kategorie | the suggestion, noting that Kleinanzeigen pre-selects one from the title |
 | Eigenschaften und Versand | condition and key attributes in your own words, marked "im Formular auswählen". Versand is "selbst festlegen" unless the user stated it |
 | Beschreibung (n/4000) | the full German description, with `<br>` for each line break |
-| Preis (Vorschlag) | e.g. "55 € pro Stück (Spanne 45–65 €) · Basis: …", then "Preistyp selbst wählen". Mark a model-knowledge price "ungeprüft (Modellwissen)". If there is no price, write "kein Vorschlag" and the reason |
+| Preis | depends on `price_status`. `offered`: "noch kein Vorschlag (siehe Frage unten)". `declined`: "selbst festlegen". `estimated`: e.g. "55 € pro Stück (Spanne 45–65 €) · Basis: … · Preistyp selbst wählen", with a model-knowledge price marked "ungeprüft (Modellwissen)". `not_applicable`: "kein Vorschlag" and the reason |
 | Title (EN) | the English title |
 | Description (EN) | the English description, with `<br>` for each line break |
 
 Escape any `|` inside cell text. The field map and limits are in `references/kleinanzeigen-copy.md`.
 
-**C. Clarifications**: at most three numbered questions. Ask only those that would materially change correctness or the price. Leave this section out when nothing important is missing.
+**C. Clarifications**: at most three numbered questions. Ask only those that would materially change correctness. Leave them out when nothing important is missing.
+While `price_status` is `offered`, end section C with one extra line, which is not one of the three questions:
+**Preisvorschlag?** Vergleichsanzeigen mit Preisen einfügen, die Websuche erlauben, oder den Preis selbst festlegen?
+Never repeat this offer after the user has declined.
 
 **D. Structured metadata**: one fenced `json` block that is valid against `schema.json`. Do not repeat all of the evidence records in prose.
 
@@ -72,7 +75,13 @@ If the user asks for JSON only, return only the JSON object: no headings, no pro
 - Keep confirmed facts and explicit user corrections. Mark the related evidence `user_confirmation: "confirmed"` or `"corrected"`.
 - Accept partial answers. Anything still unanswered stays unknown (`null`, or in `unknowns`).
 - If a correction conflicts materially with what a photo shows, apply the user's correction but say what the conflict is in one sentence. Do not silently drop either side.
-- Recompute the price whenever identity, condition, function, quantity or sale configuration changes, or the user pastes comparable prices.
+- Pricing replies:
+  - **Comparable prices pasted** → estimate (`user_comparables`).
+  - **Web search allowed** → search if the host can. Use `reference_new_price` with cited URLs, or the labelled fallback if nothing usable is found or the host cannot browse.
+  - **"Just estimate"** → labelled `model_knowledge` range.
+  - **"I'll set it myself" ("mache ich selbst")** → `price_status: "declined"`, no price and no further price questions.
+  - **Ignored offer** → leave it `offered`; do not nag. Mention it once more only if the user later asks to finish.
+- Once estimated, recompute the price whenever identity, condition, function, quantity or sale configuration changes, or the user pastes comparable prices.
 - Start the reply with one to three bullets saying what changed. Then return the revised A–D, unless the user asked for something narrower.
 - Stop asking questions once the result is useful enough or the user wants to go ahead.
 - If a photo from an earlier turn is no longer available, do not re-describe it from memory as if you were re-inspecting it. Rely on the facts already recorded, and ask for the photo again if you need new detail.

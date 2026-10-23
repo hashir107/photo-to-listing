@@ -325,11 +325,16 @@ def semantic_errors(doc):
 
 
 def price_errors(doc, by_id):
-    """Every price needs a stated, matching basis. See references/pricing.md."""
+    """Pricing is opt-in, and every price needs a stated, matching basis. See references/pricing.md."""
     price = doc.get("price_estimate")
-    if price is None:
-        return []
+    status = doc.get("price_status")
     errors = []
+    if (status == "estimated") != (price is not None):
+        errors.append("price_estimate must be set exactly when price_status is 'estimated'")
+    if doc.get("item_type") is None and status != "not_applicable":
+        errors.append("price_status must be 'not_applicable' while item_type is unknown")
+    if price is None:
+        return errors
     if doc.get("item_type") is None:
         errors.append("price_estimate must be null while item_type is unknown")
     if not price["low"] <= price["suggested"] <= price["high"]:

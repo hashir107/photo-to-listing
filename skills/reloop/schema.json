@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.3.0",
+  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.4.0",
   "title": "ReLoop listing metadata",
   "description": "Structured re-commerce metadata and Kleinanzeigen-style listing copy derived from user-supplied photos and notes. Unknown scalar values are null. For the assessable lists (visible_defects, included_accessories, missing_accessories), null means not assessed and [] means assessed with nothing found or confirmed. See references/extraction-rules.md.",
   "type": "object",
@@ -28,6 +28,7 @@
     "evidence",
     "unknowns",
     "clarification_questions",
+    "price_status",
     "price_estimate",
     "listing_language",
     "listing_title",
@@ -37,7 +38,7 @@
   "properties": {
     "schema_version": {
       "description": "Version of this schema the document conforms to.",
-      "const": "0.3.0"
+      "const": "0.4.0"
     },
     "revision": {
       "description": "Starts at 1 and increments with each update in the same conversation.",
@@ -182,8 +183,17 @@
         "$ref": "#/$defs/question"
       }
     },
+    "price_status": {
+      "description": "Price suggestion is opt-in. offered: asked the user, no price yet. estimated: price_estimate is filled. declined: the user sets the price themselves. not_applicable: no price possible yet (e.g. item type unknown). See references/pricing.md section 0.",
+      "enum": [
+        "offered",
+        "estimated",
+        "declined",
+        "not_applicable"
+      ]
+    },
     "price_estimate": {
-      "description": "Suggested price for the Kleinanzeigen 'Preis' field with its basis; null when no responsible suggestion is possible. See references/pricing.md.",
+      "description": "Suggested price with its basis; non-null only when price_status is 'estimated'. See references/pricing.md.",
       "type": [
         "object",
         "null"
