@@ -5,7 +5,7 @@ license: MIT (see LICENSE.txt)
 compatibility: Requires a host that can view user-supplied images. No API keys or external services are needed; web search is optional and only used with the user's go-ahead for price suggestions.
 metadata:
   display-name: ReLoop
-  version: "0.4.1"
+  version: "0.4.2"
   project: photo-to-listing
 ---
 

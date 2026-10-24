@@ -1,7 +1,7 @@
 {
   "name": "photo-to-listing",
   "displayName": "ReLoop",
-  "description": "ReLoop: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy with a sourced price suggestion, refined through short follow-up questions.",
+  "description": "ReLoop: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy with an optional price suggestion, refined through short follow-up questions.",
   "author": {
     "name": "hashir107",
     "url": "https://github.com/hashir107"

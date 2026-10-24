@@ -9,7 +9,17 @@
 
 You can answer the questions over later turns. The result is updated in place, and confirmed facts and corrections are kept.
 
-> Version 0.4.1. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+> Version 0.4.2. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+
+## Try it
+
+1. **Get access.** This repository is private for now. You need a GitHub account, and you must accept the collaborator invite, which arrives by email and at [github.com/notifications](https://github.com/notifications). Stay logged in to GitHub for the downloads below.
+2. **Download** the ZIP for your app from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest):
+   - **Claude** (claude.ai, desktop or mobile app): `photo-to-listing-skill-v0.4.2.zip`. Turn on code execution under **Settings → Capabilities**. Then go to **Customize → Skills**, click **+**, choose **Upload a skill** and pick the ZIP without unzipping it. [Details](#claude-and-claude-code)
+   - **ChatGPT desktop app or Codex:** copy the `reloop` folder into `~/.agents/skills/` ([details](#codex-and-the-chatgpt-desktop-app)), or let your coding agent do it ([agent install](#quick-install-with-a-coding-agent-codex-chatgpt-desktop-app-claude-code)).
+   - **Claude Code:** copy the `reloop` folder into `~/.claude/skills/`, or use the agent install. [Details](#claude-and-claude-code)
+3. **Use it.** Start a new chat, attach a few photos of the item (include a close-up of any label), add one line such as *"24 LG monitors, office closing"*, and ask for a Kleinanzeigen listing. Answer the follow-up questions if you like. To get a price suggestion, paste a few comparable prices or allow a web search when ReLoop offers it.
+4. **Tell me how it went:** see [Feedback](#feedback).
 
 ## What it does and does not do
 
@@ -78,15 +88,24 @@ Copy all of it. `SKILL.md` on its own is not enough, because it reads the files 
 | Codex CLI, Codex IDE extension, ChatGPT desktop app | `~/.agents/skills` (or `<repo>/.agents/skills` for one repository only) |
 | Claude Code | `~/.claude/skills` (or `<repo>/.claude/skills` for one repository only) |
 
+**Prerequisite:** the repository is private. The user's GitHub account needs access, which means they have accepted the collaborator invite. The machine also needs a way to authenticate: the GitHub CLI logged in (`gh auth login`), stored HTTPS git credentials, or an SSH key. If none works, stop and tell the user to accept the invite and run `gh auth login`.
+
 Run this script. Set `DEST` to the skills directory from the table; it defaults to `~/.agents/skills`. It is safe to re-run, and re-running updates to the latest version. It only touches `$DEST/reloop` and a temporary folder.
 
 ```bash
 set -euo pipefail
 DEST="${DEST:-$HOME/.agents/skills}"
+REPO="hashir107/photo-to-listing"
 TMP="$(mktemp -d)"
-# The repository is private: use an account with access (gh auth login, or an SSH key).
-gh repo clone hashir107/photo-to-listing "$TMP/src" -- --depth 1 \
-  || git clone --depth 1 git@github.com:hashir107/photo-to-listing.git "$TMP/src"
+# Private repository: try the GitHub CLI, then HTTPS with stored credentials, then SSH (no interactive prompts).
+if command -v gh >/dev/null 2>&1 && gh repo clone "$REPO" "$TMP/src" -- --depth 1 --quiet 2>/dev/null; then :
+elif GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet "https://github.com/$REPO.git" "$TMP/src" 2>/dev/null; then :
+elif GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone --depth 1 --quiet "git@github.com:$REPO.git" "$TMP/src" 2>/dev/null; then :
+else
+  rm -rf "$TMP"
+  echo "No access to $REPO: accept the collaborator invite, run 'gh auth login', then retry." >&2
+  exit 1
+fi
 mkdir -p "$DEST"
 rm -rf "$DEST/reloop"
 cp -R "$TMP/src/skills/reloop" "$DEST/reloop"
@@ -103,15 +122,16 @@ Then tell the user to **restart** the app or CLI. The skill is invoked with `$re
 
 ### Get the packages
 
-Each package is built from `skills/reloop/`. You can get them in either of two ways:
+Each package is built from `skills/reloop/`. You can get them in any of three ways:
 
+- **Releases (easiest):** download the ZIPs from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest). The repository is private, so you must be logged in to GitHub with an account that has accepted the collaborator invite. `SHA256SUMS.txt` on the same page lets you check the downloads.
 - **Build them locally** with `python3 scripts/build_releases.py`. The ZIPs appear in `dist/`.
-- **Download them from GitHub:** open the repository's **Actions** tab, open the latest **validate** run, and download the **photo-to-listing-packages** artifact. That artifact is itself a ZIP: unzip it once to get the three package ZIPs, and never upload the outer artifact ZIP.
+- **From a CI run:** open the repository's **Actions** tab, open the latest **validate** run, and download the **photo-to-listing-packages** artifact. That artifact is itself a ZIP: unzip it once to get the three package ZIPs, and never upload the outer artifact ZIP.
 
 | You use | Package |
 | --- | --- |
-| Claude apps (claude.ai, desktop, mobile) and Claude Code | `photo-to-listing-skill-v0.4.1.zip`. Claude Code can also use the `skills/reloop` folder or `photo-to-listing-claude-code-v0.4.1.zip` |
-| Codex or the ChatGPT desktop app | `photo-to-listing-codex-v0.4.1.zip`, or the `skills/reloop` folder from this repository |
+| Claude apps (claude.ai, desktop, mobile) and Claude Code | `photo-to-listing-skill-v0.4.2.zip`. Claude Code can also use the `skills/reloop` folder or `photo-to-listing-claude-code-v0.4.2.zip` |
+| Codex or the ChatGPT desktop app | `photo-to-listing-codex-v0.4.2.zip`, or the `skills/reloop` folder from this repository |
 
 ### Claude and Claude Code
 
@@ -120,7 +140,7 @@ Each package is built from `skills/reloop/`. You can get them in either of two w
 1. **Turn on code execution**, which skills need.
    - Free, Pro or Max: **Settings → Capabilities**, then turn on **Code execution and file creation**.
    - Team or Enterprise: an admin enables it under **Organization settings → Plugins & skills**.
-2. **Upload the skill.** Go to **Customize → Skills**, click **+**, then **+ Create skill → Upload a skill**. Choose `photo-to-listing-skill-v0.4.1.zip`. Upload the ZIP as it is; don't unzip it. Its top-level folder is `reloop/`, which is what Claude expects.
+2. **Upload the skill.** Go to **Customize → Skills**, click **+**, then **+ Create skill → Upload a skill**. Choose `photo-to-listing-skill-v0.4.2.zip`. Upload the ZIP as it is; don't unzip it. Its top-level folder is `reloop/`, which is what Claude expects.
 3. **Switch it on.** Make sure **reloop** is enabled in the skills list.
 4. **Use it.** Start a new chat, attach your photos, add a short note and ask for a listing, for example *"24 LG monitors, office closing. Draft a Kleinanzeigen listing."* If it doesn't kick in, add *"Use the ReLoop skill."*
 
@@ -139,14 +159,14 @@ cp -R skills/reloop ~/.claude/skills/reloop
 
 Run this from a clone of this repository, or use the agent script above with `DEST=~/.claude/skills`. To make it available in one project only, copy the folder to `<project>/.claude/skills/reloop` instead. Start a new Claude Code session, then type `/reloop`, or ask for a Kleinanzeigen listing and give it your photos: paste or drag them in, or give their file paths.
 
-**Option C: Claude Code as a plugin.** Unzip `photo-to-listing-claude-code-v0.4.1.zip`, then:
+**Option C: Claude Code as a plugin.** Unzip `photo-to-listing-claude-code-v0.4.2.zip`, then:
 
 ```bash
-claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.1
+claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.2
 claude plugin install photo-to-listing@photo-to-listing-local
 ```
 
-With the plugin, the skill is invoked as `/photo-to-listing:reloop`. To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.1/plugins/photo-to-listing`. The package's `INSTALL.md` has details.
+With the plugin, the skill is invoked as `/photo-to-listing:reloop`. To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.2/plugins/photo-to-listing`. The package's `INSTALL.md` has details.
 
 Use only one of these in Claude Code (account sync, the skill folder, or the plugin). Otherwise ReLoop may be listed more than once.
 
@@ -164,7 +184,7 @@ Use only one of these in Claude Code (account sync, the skill folder, or the plu
    Or from the unzipped Codex package:
 
    ```bash
-   cp -R photo-to-listing-codex-v0.4.1/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
+   cp -R photo-to-listing-codex-v0.4.2/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
    ```
 
    To make it available in one repository only, copy it to `<repo>/.agents/skills/reloop` instead.
@@ -177,10 +197,10 @@ Use only one of these in Claude Code (account sync, the skill folder, or the plu
 
 Standalone skills are not available on chatgpt.com or in the ChatGPT phone app. Only skills bundled in plugins from the Plugins Directory reach those.
 
-**Option B: install as a plugin.** Unzip `photo-to-listing-codex-v0.4.1.zip`, then register its local marketplace (this needs the Codex CLI):
+**Option B: install as a plugin.** Unzip `photo-to-listing-codex-v0.4.2.zip`, then register its local marketplace (this needs the Codex CLI):
 
 ```bash
-codex plugin marketplace add ./photo-to-listing-codex-v0.4.1
+codex plugin marketplace add ./photo-to-listing-codex-v0.4.2
 ```
 
 Then install **ReLoop** from **Plugins → photo-to-listing (local)** in the ChatGPT desktop app. The package's `INSTALL.md` has details. This route hasn't been tested yet; see [compatibility](docs/compatibility.md).
@@ -268,7 +288,7 @@ Optional cross-checks, also run in CI:
 ```bash
 pip install jsonschema "skills-ref @ git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref"
 python3 scripts/validate.py --external
-claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.4.1   # if Claude Code is installed
+claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.4.2   # if Claude Code is installed
 ```
 
 The build is reproducible: identical sources give byte-identical ZIPs. The workflow in `.github/workflows/validate.yml` validates, tests, builds and uploads the packages as workflow artifacts. It never publishes a release.
@@ -279,6 +299,20 @@ The build is reproducible: identical sources give byte-identical ZIPs. The workf
 - Different hosts and models may follow the skill differently. Behaviour is not guaranteed to be identical across Claude, Claude Code and Codex.
 - Codex plugin installation was not tested in this environment; see [docs/compatibility.md](docs/compatibility.md).
 - Category suggestions are human-readable paths, not official Kleinanzeigen category IDs.
+
+## Feedback
+
+Testers' feedback is the most useful input at this stage: so far ReLoop has only been tested on synthetic images. Please [open an issue](https://github.com/hashir107/photo-to-listing/issues/new) and include:
+
+- the app and model you used (for example "Claude desktop, Opus" or "ChatGPT desktop"),
+- what you sent: the item and your one-line note,
+- what was wrong or missing, and what you expected.
+
+**Don't attach photos that show personal data**, serial numbers, addresses, documents or people. Describe the photo instead, or crop it first.
+
+## Disclaimer
+
+ReLoop is an independent project. It is not affiliated with, endorsed by or connected to Kleinanzeigen. Listing drafts and price suggestions are AI-generated: check every fact before you post, and set the final price yourself. Your photos are processed by the AI app you use (Claude, ChatGPT or Codex) under that provider's terms. ReLoop itself has no server and stores nothing.
 
 ## License
 

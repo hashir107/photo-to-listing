@@ -21,9 +21,9 @@
 
 | Target | Package | Format used | Notes |
 | --- | --- | --- | --- |
-| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.1.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
-| Claude Code | `photo-to-listing-claude-code-v0.4.1.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
-| Codex | `photo-to-listing-codex-v0.4.1.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
+| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.2.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
+| Claude Code | `photo-to-listing-claude-code-v0.4.2.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
+| Codex | `photo-to-listing-codex-v0.4.2.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
 
 All three contain byte-identical copies of `skills/reloop/`, and `scripts/build_releases.py` verifies this.
 

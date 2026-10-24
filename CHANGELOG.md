@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-10-24
+
+### Added
+- README "Try it" quick start for testers covering access to the private repo, downloads from Releases,
+  Claude upload, ChatGPT/Codex/Claude Code folder install and first use, plus **Feedback**
+  and **Disclaimer** sections (not affiliated with Kleinanzeigen; AI drafts must be checked).
+- GitHub Release packages are now the primary download.
+
+### Changed
+- Agent install script: tries the GitHub CLI, then HTTPS with stored credentials, then SSH,
+  all without interactive prompts, and exits with a clear "no access" message.
+- Plugin manifest descriptions say "optional price suggestion", and a fixture expectation
+  now names the current "Preis" row.
+
 ## [0.4.1] - 2026-10-24
 
 ### Added

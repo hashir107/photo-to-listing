@@ -24,7 +24,7 @@
             "Dark screens are not treated as evidence of function.",
             "The serial number is not recorded anywhere.",
             "German listing copy first, then English; no price, shipping or warranty text in the title or description.",
-            "Section B is one table: Titel, Kategorie, Eigenschaften und Versand, Beschreibung, Preis (Vorschlag), Title (EN), Description (EN); the description sits inside the table with <br> line breaks.",
+            "Section B is one table: Titel, Kategorie, Eigenschaften und Versand, Beschreibung, Preis (noch kein Vorschlag), Title (EN), Description (EN); the description sits inside the table with <br> line breaks.",
             "A 'Hinweis zu Fotos' line under section A says to cover the serial number on the label photo before uploading.",
             "No price by default: the Preis row says 'noch kein Vorschlag (siehe Frage unten)' and section C ends with the one-line 'Preisvorschlag?' offer."
           ],
