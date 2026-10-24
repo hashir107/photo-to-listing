@@ -46,6 +46,8 @@ LISTING_FORBIDDEN = [
     (re.compile(r"https?://", re.I), "URL"),
 ]
 
+OS_METADATA_NAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
+
 PLACEHOLDERS = {"unknown", "unbekannt", "n/a", "na", "none", "null", "-", "?", "tbd"}
 
 SECRET_PATTERNS = [
@@ -175,7 +177,9 @@ def check_skill_dir(skill_dir, expected_version=None):
         if re.search(r"(?<![\w.])\.\./|(?:^|[\s`(])/(?:Users|home|tmp|private)/|[A-Za-z]:\\\\", content):
             problems.append(f"{md.name}: contains a parent-relative or absolute filesystem path")
 
-    files = sorted(p for p in skill_dir.rglob("*") if p.is_file() or p.is_symlink())
+    # OS metadata (e.g. Finder's .DS_Store) is gitignored and never packaged, so it is skipped here.
+    files = sorted(p for p in skill_dir.rglob("*")
+                   if (p.is_file() or p.is_symlink()) and p.name not in OS_METADATA_NAMES)
     for path in files:
         rel = path.relative_to(skill_dir).as_posix()
         if path.is_symlink():

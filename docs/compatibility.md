@@ -58,8 +58,10 @@ The installation and image rows below were run on v0.1.0. For v0.2.0 to v0.4.0, 
 | **Actual install**: `claude plugin marketplace add` and `claude plugin install photo-to-listing@photo-to-listing-local` from the unzipped package | Claude Code 2.1.292, isolated `CLAUDE_CONFIG_DIR` | Installed, enabled, version 0.1.0. `claude plugin details` lists skill `reloop` (~150 tokens always on, ~1.7k on invoke) |
 | Headless skill run via `claude -p --plugin-dir …` | Claude Code 2.1.292 | **Not run.** The standalone CLI on the test machine was not logged in, and credentials were not entered on the user's behalf. |
 | Image run that follows the packaged SKILL.md | Claude Code desktop subagent (Claude Opus 5.5), 2 synthetic images | See [evaluation.md](evaluation.md). The skill was loaded by hand, not through plugin activation. |
-| Claude.ai ZIP upload | — | **Not tested.** It needs a manual upload in the user's account. The ZIP structure matches the documented requirement. |
-| Codex plugin or skill install | — | **Not tested.** Codex CLI is not installed on the test machine, and the ChatGPT desktop app was not modified. The manifest is validated against the official schema only. |
+| Claude ZIP upload (Customize → Skills) | User's Claude account | **v0.1.0 accepted**: after the user uploaded it, the skill appeared in their account's skill list (observed 2026-10-23). Later versions use the same ZIP layout but have not been uploaded yet. Mobile availability has not been verified. |
+| Skill folder in `~/.agents/skills/reloop` | ChatGPT desktop app (macOS) | **Works, as reported by the user** (2026-10-24, v0.4.0) |
+| Skill folder in `~/.agents/skills/reloop` | Codex CLI / IDE extension | **Not tested.** Codex CLI is not installed on the test machine; this uses the same documented skill location as the ChatGPT desktop app. |
+| Codex plugin via local marketplace | — | **Not tested.** The manifest is validated against the official Agent Plugins schema only. |
 
 ## Untested assumptions and limitations
 

@@ -52,9 +52,9 @@ def skill_files():
         rel = path.relative_to(SKILL_DIR).as_posix()
         if path.is_symlink():
             raise SystemExit(f"refusing to package symlink: {rel}")
-        if not path.is_file():
-            continue
-        if path.name in JUNK_NAMES or path.suffix in JUNK_SUFFIXES or "__pycache__" in rel:
+        if not path.is_file() or path.name in validate.OS_METADATA_NAMES:
+            continue  # OS metadata such as .DS_Store is gitignored and never packaged
+        if path.suffix in JUNK_SUFFIXES or "__pycache__" in rel:
             raise SystemExit(f"refusing to package temporary file: {rel} (delete it first)")
         files[rel] = path.read_bytes()
     return files
