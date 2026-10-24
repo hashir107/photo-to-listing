@@ -107,13 +107,12 @@ Each package is built from `skills/reloop/`. You can get them in either of two w
 
 | You use | Package |
 | --- | --- |
-| Claude (claude.ai, desktop or mobile app) | `photo-to-listing-skill-v0.4.0.zip` |
-| Claude Code | `photo-to-listing-claude-code-v0.4.0.zip` |
+| Claude apps (claude.ai, desktop, mobile) and Claude Code | `photo-to-listing-skill-v0.4.0.zip`. Claude Code can also use the `skills/reloop` folder or `photo-to-listing-claude-code-v0.4.0.zip` |
 | Codex or the ChatGPT desktop app | `photo-to-listing-codex-v0.4.0.zip`, or the `skills/reloop` folder from this repository |
 
-### Claude (claude.ai, desktop and mobile app)
+### Claude and Claude Code
 
-Upload the skill once from claude.ai or the Claude desktop app. The upload needs a ZIP file, so do it on a computer.
+**Option A: upload once to your Claude account (claude.ai, desktop and mobile app).** Upload the skill from claude.ai or the Claude desktop app. The upload needs a ZIP file, so do it on a computer.
 
 1. **Turn on code execution**, which skills need.
    - Free, Pro or Max: **Settings → Capabilities**, then turn on **Code execution and file creation**.
@@ -126,15 +125,27 @@ Upload the skill once from claude.ai or the Claude desktop app. The upload needs
 
 Skills you upload are tied to your Claude account. Anthropic's help article doesn't say whether uploaded skills appear in the iOS and Android apps, so this hasn't been confirmed. If ReLoop doesn't show up on your phone, open claude.ai in the phone's browser instead.
 
-### Claude Code: `photo-to-listing-claude-code-v0.4.0.zip`
+According to Anthropic's help article, Claude Code also loads skills from your Claude account when it is signed in with that account. This is a one-way sync, and it doesn't happen with an API key or a cloud provider. After Option A, ReLoop may therefore already be available in Claude Code; type `/reloop` to check. This sync hasn't been tested for ReLoop.
+
+**Option B: Claude Code only, as a skill folder.** Use this if the sync doesn't apply, or if you only use Claude Code. It is the same folder as for Codex, placed in Claude Code's skills directory:
 
 ```bash
-unzip photo-to-listing-claude-code-v0.4.0.zip
+mkdir -p ~/.claude/skills
+cp -R skills/reloop ~/.claude/skills/reloop
+```
+
+Run this from a clone of this repository, or use the agent script above with `DEST=~/.claude/skills`. To make it available in one project only, copy the folder to `<project>/.claude/skills/reloop` instead. Start a new Claude Code session, then type `/reloop`, or ask for a Kleinanzeigen listing and give it your photos: paste or drag them in, or give their file paths.
+
+**Option C: Claude Code as a plugin.** Unzip `photo-to-listing-claude-code-v0.4.0.zip`, then:
+
+```bash
 claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.0
 claude plugin install photo-to-listing@photo-to-listing-local
 ```
 
-To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.0/plugins/photo-to-listing`. To invoke it explicitly, use `/photo-to-listing:reloop`. The package's `INSTALL.md` has details.
+With the plugin, the skill is invoked as `/photo-to-listing:reloop`. To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.0/plugins/photo-to-listing`. The package's `INSTALL.md` has details.
+
+Use only one of these in Claude Code (account sync, the skill folder, or the plugin). Otherwise ReLoop may be listed more than once.
 
 ### Codex and the ChatGPT desktop app
 
