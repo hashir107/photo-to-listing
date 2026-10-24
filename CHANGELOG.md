@@ -4,7 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.4.3] - 2026-10-24
+
+### Added
+- ReLoop logo (`skills/reloop/assets/logo.png`, `icon-small.png`), shown at the top of the README.
+- `skills/reloop/agents/openai.yaml` gives a display name, tagline, icon and brand colour for the ChatGPT desktop app and Codex.
+- Plugin icons: the Codex `composerIcon`, `logo` and `brandColor`; Claude Code's `icon`, which only Anthropic's directory reads.
+  The build copies the icons into each plugin's `./assets/`.
+- The validator allows exactly these two logo images and checks every icon path.
 
 ### Changed
 - The repository was renamed to `hashir107/reloop`; README links, the agent install script and the plugin

@@ -21,9 +21,9 @@
 
 | Target | Package | Format used | Notes |
 | --- | --- | --- | --- |
-| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.2.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
-| Claude Code | `photo-to-listing-claude-code-v0.4.2.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
-| Codex | `photo-to-listing-codex-v0.4.2.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
+| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.3.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
+| Claude Code | `photo-to-listing-claude-code-v0.4.3.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
+| Codex | `photo-to-listing-codex-v0.4.3.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
 
 All three contain byte-identical copies of `skills/reloop/`, and `scripts/build_releases.py` verifies this.
 
@@ -68,3 +68,13 @@ The installation and image rows below were run on v0.1.0. For v0.2.0 to v0.4.0, 
 - Codex: it is assumed that `codex plugin marketplace add` accepts the unzipped folder as a local marketplace root, and that the Plugins Directory lists the plugin. Both follow the documentation but were not verified.
 - Claude.ai: it is assumed that the upload accepts a ZIP that also contains `examples/` and `schema.json` next to `references/`. The documentation allows arbitrary extra files.
 - Activation reliability, meaning how often each host picks the skill on its own, was not measured. Explicit invocation is the fallback.
+
+## Logo display
+
+| Where | Shown? | How |
+| --- | --- | --- |
+| GitHub README | Yes | `skills/reloop/assets/logo.png` at the top of the README |
+| ChatGPT desktop app / Codex, skill-folder install | Expected | `agents/openai.yaml` `icon_small` / `icon_large` (documented fields; not yet verified on screen) |
+| Codex / ChatGPT plugin install | Expected | `extensions.com.openai.interface.composerIcon` and `logo` → `./assets/` in the plugin |
+| Claude Code | No | `plugin.json` `icon` is read only by Anthropic's plugin directory, not by Claude Code itself |
+| Claude (claude.ai, desktop, mobile) | No | uploaded custom skills have no icon field |

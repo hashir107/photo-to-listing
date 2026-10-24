@@ -27,3 +27,7 @@ Thumbs.db
 *.pem
 *.key
 local-photos/
+
+# ...except the ReLoop logo, the one intended image
+!skills/reloop/assets/logo.png
+!skills/reloop/assets/icon-small.png

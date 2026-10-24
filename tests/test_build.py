@@ -66,6 +66,14 @@ class BuildTests(unittest.TestCase):
                         for name, data in entries.items() if "reloop/" in name}
             self.assertEqual(packaged, source, archive)
 
+    def test_plugin_packages_carry_root_icons(self):
+        contents = build_releases.package_contents(self.version)
+        names = build_releases.archive_names(self.version)
+        for kind in ("codex", "claude-code"):
+            root = names[kind][:-4]
+            for icon in ("logo.png", "icon-small.png"):
+                self.assertIn(f"{root}/plugins/photo-to-listing/assets/{icon}", contents[names[kind]])
+
     def test_build_is_reproducible(self):
         with tempfile.TemporaryDirectory() as other:
             again = build_releases.build(Path(other), self.version)

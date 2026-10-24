@@ -33,7 +33,7 @@ SPEC_FRONTMATTER_KEYS = {"name", "description", "license", "compatibility", "met
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 # Bundled resource references inside skill Markdown: `references/x.md`, (examples/y.json), schema.json
-RESOURCE_REF_RE = re.compile(r"(?<![\w/.-])((?:references|examples|scripts|assets)/[\w./-]+|schema\.json)")
+RESOURCE_REF_RE = re.compile(r"(?<![\w/.-])((?:references|examples|scripts|assets|agents)/[\w./-]+|schema\.json)")
 
 # Listing-copy policy: things ReLoop must never add on its own.
 LISTING_FORBIDDEN = [
@@ -47,6 +47,16 @@ LISTING_FORBIDDEN = [
 ]
 
 LICENSE_SPDX = "MIT"
+# The only images allowed anywhere: the ReLoop logo files in the skill's assets/ folder.
+LOGO_FILES = {"logo.png", "icon-small.png"}
+
+
+def is_logo_file(path):
+    """True for assets/logo.png and assets/icon-small.png (repo, skill or package paths)."""
+    parts = Path(path).as_posix().split("/")
+    return len(parts) >= 2 and parts[-2] == "assets" and parts[-1] in LOGO_FILES
+
+
 LICENSE_IN_SKILL = "LICENSE.txt"
 OS_METADATA_NAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
 
@@ -180,6 +190,13 @@ def check_skill_dir(skill_dir, expected_version=None):
             problems.append(f"{md.name}: contains a parent-relative or absolute filesystem path")
 
     # OS metadata (e.g. Finder's .DS_Store) is gitignored and never packaged, so it is skipped here.
+    openai_yaml = skill_dir / "agents" / "openai.yaml"
+    if openai_yaml.is_file():
+        for m in re.finditer(r"^\s*icon_(?:small|large):\s*\"?([^\"\n]+?)\"?\s*$", openai_yaml.read_text(encoding="utf-8"), re.M):
+            icon = m.group(1).removeprefix("./")
+            if not (skill_dir / icon).is_file() or ".." in icon.split("/"):
+                problems.append(f"agents/openai.yaml: icon {m.group(1)!r} is not a file inside the skill")
+
     files = sorted(p for p in skill_dir.rglob("*")
                    if (p.is_file() or p.is_symlink()) and p.name not in OS_METADATA_NAMES)
     for path in files:
@@ -505,6 +522,11 @@ def check_packaging():
         if not (ROOT / rel).is_file():
             problems.append(f"{rel}: missing")
     problems.extend(check_license(cc_plugin, cx_plugin))
+    cx_interface = cx_plugin.get("extensions", {}).get("com.openai", {}).get("interface", {})
+    for label, icon in (("claude-code icon", cc_plugin.get("icon")), ("codex composerIcon", cx_interface.get("composerIcon")),
+                        ("codex logo", cx_interface.get("logo"))):
+        if icon is not None and not (icon.startswith("./assets/") and (SKILL_DIR / icon[2:]).is_file()):
+            problems.append(f"{label} {icon!r} must be ./assets/<file> copied from skills/{SKILL_NAME}/assets/")
     return problems
 
 
@@ -547,6 +569,8 @@ def iter_repo_files():
 def check_hygiene():
     problems = []
     for path, rel in iter_repo_files():
+        if is_logo_file(rel) and rel.parts[:2] == ("skills", SKILL_NAME):
+            continue  # the logo is the one intended binary file
         if path.suffix.lower() in PRIVATE_SUFFIXES or path.name in PRIVATE_NAMES:
             problems.append(f"{rel}: private or binary file type must not be committed")
             continue

@@ -5,7 +5,7 @@ license: MIT (see LICENSE.txt)
 compatibility: Requires a host that can view user-supplied images. No API keys or external services are needed; web search is optional and only used with the user's go-ahead for price suggestions.
 metadata:
   display-name: ReLoop
-  version: "0.4.2"
+  version: "0.4.3"
   project: photo-to-listing
 ---
 
@@ -19,6 +19,7 @@ Bundled resources. They are relative to this file, so read them when the step sa
 - `references/kleinanzeigen-copy.md`: read it before writing listing copy. It holds the form map, German and English templates, condition wording and things never to write.
 - `references/pricing.md`: read it before offering or suggesting a price. It covers the opt-in, price sources in order of preference, depreciation bands, lots, rounding and what never to do.
 - `schema.json`: the JSON Schema that section D must follow.
+- `agents/openai.yaml`, `assets/logo.png` and `assets/icon-small.png`: display name and icon for apps that show them (ChatGPT desktop, Codex). You don't need to read them for the task.
 - `examples/cases.json`: worked examples with expected outputs, covering an unreadable label, a multi-turn correction, injected text in a photo, no image access, a note that conflicts with a label, JSON-only output, a batch of units, an ambiguous number, unrelated objects, pricing from pasted comparables and a user who declines a price suggestion.
 
 ## 1. Check that you can actually see the photos

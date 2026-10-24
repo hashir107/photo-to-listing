@@ -364,6 +364,24 @@ class FrontmatterParser(unittest.TestCase):
             self.assertEqual(validate.check_skill_dir(skill), [])
 
 
+class LogoChecks(unittest.TestCase):
+    def test_only_logo_images_allowed(self):
+        self.assertTrue(validate.is_logo_file("skills/reloop/assets/logo.png"))
+        self.assertTrue(validate.is_logo_file("photo-to-listing-codex-v1/plugins/photo-to-listing/assets/icon-small.png"))
+        self.assertFalse(validate.is_logo_file("skills/reloop/assets/photo_of_my_desk.png"))
+        self.assertFalse(validate.is_logo_file("logo.png"))
+
+    def test_openai_yaml_icon_must_exist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp) / "x"
+            (skill / "agents").mkdir(parents=True)
+            (skill / "SKILL.md").write_text("---\nname: x\ndescription: Does things.\n---\n\nSee `agents/openai.yaml`.\n",
+                                          encoding="utf-8")
+            (skill / "agents" / "openai.yaml").write_text('interface:\n  icon_large: "./assets/missing.png"\n',
+                                                          encoding="utf-8")
+            self.assertTrue(any("is not a file inside the skill" in p for p in validate.check_skill_dir(skill)))
+
+
 class LicenseChecks(unittest.TestCase):
     def test_repo_license_is_consistent(self):
         manifests = [json.loads((ROOT / p).read_text(encoding="utf-8"))

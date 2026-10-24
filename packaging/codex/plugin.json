@@ -26,7 +26,10 @@
         "category": "Productivity",
         "defaultPrompt": [
           "Use ReLoop to turn these photos into a Kleinanzeigen listing."
-        ]
+        ],
+        "brandColor": "#183F48",
+        "composerIcon": "./assets/icon-small.png",
+        "logo": "./assets/logo.png"
       }
     }
   }

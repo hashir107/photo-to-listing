@@ -85,6 +85,8 @@ def package_contents(version):
     names = archive_names(version)
 
     skill_zip = {f"{SKILL}/{rel}": data for rel, data in skill.items()}
+    # Plugin presentation icons live at the plugin root (./assets/), copied from the skill's own assets.
+    icons = {rel: data for rel, data in skill.items() if rel.startswith("assets/")}
 
     cc_root = f"{PLUGIN}-claude-code-v{version}"
     cc_plugin = f"{cc_root}/plugins/{PLUGIN}"
@@ -94,6 +96,7 @@ def package_contents(version):
         f"{cc_root}/INSTALL.md": text_template("packaging/claude-code/INSTALL.md", version),
         f"{cc_plugin}/.claude-plugin/plugin.json": manifest("packaging/claude-code/plugin.json", version),
         **{f"{cc_plugin}/skills/{SKILL}/{rel}": data for rel, data in skill.items()},
+        **{f"{cc_plugin}/{rel}": data for rel, data in icons.items()},
     }
 
     cx_root = f"{PLUGIN}-codex-v{version}"
@@ -104,6 +107,7 @@ def package_contents(version):
         f"{cx_root}/INSTALL.md": text_template("packaging/codex/INSTALL.md", version),
         f"{cx_plugin}/plugin.json": manifest("packaging/codex/plugin.json", version),
         **{f"{cx_plugin}/skills/{SKILL}/{rel}": data for rel, data in skill.items()},
+        **{f"{cx_plugin}/{rel}": data for rel, data in icons.items()},
     }
     return {names["skill"]: skill_zip, names["codex"]: codex, names["claude-code"]: claude_code}
 
@@ -179,8 +183,8 @@ def verify_dist(dist_dir, version):
             problems.append(f"{fname}: does not match shared source (extra={extra}, missing={missing}, differ={differ})")
         for name in entries:
             leaf = name.rsplit("/", 1)[-1]
-            if leaf in validate.PRIVATE_NAMES or leaf in JUNK_NAMES or \
-                    Path(leaf).suffix.lower() in validate.PRIVATE_SUFFIXES:
+            if leaf in validate.PRIVATE_NAMES or leaf in JUNK_NAMES or (
+                    Path(leaf).suffix.lower() in validate.PRIVATE_SUFFIXES and not validate.is_logo_file(name)):
                 problems.append(f"{fname}: excluded file {name}")
             if any(part in ("tests", "docs", ".github", "dist") for part in name.split("/")):
                 problems.append(f"{fname}: development-only path {name}")
