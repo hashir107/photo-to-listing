@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Changed
+- The repository was renamed to `hashir107/reloop`; README links, the agent install script and the plugin
+  manifests' `repository` URLs point to the new name. Old links redirect. README tagline: "Snap it, List it, keep it in the loop."
 - The repository is now public. The README no longer requires a collaborator invite, the agent install script tries a
   plain HTTPS clone first, and a Contributing section describes the fork → pull request flow.
 - Added `.github/CODEOWNERS`: every change needs the owner's review. `main` is protected by a ruleset that

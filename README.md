@@ -1,4 +1,6 @@
-# photo-to-listing: the ReLoop skill
+# ReLoop
+
+**Snap it, List it, keep it in the loop.**
 
 **ReLoop** is an [Agent Skill](https://agentskills.io/specification) for second-hand items. It turns photos of an item or bundle, plus an optional one-line note, into four things:
 
@@ -9,11 +11,11 @@
 
 You can answer the questions over later turns. The result is updated in place, and confirmed facts and corrections are kept.
 
-> Version 0.4.2. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+> Version 0.4.2. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop". The download packages and the plugin are still named `photo-to-listing`, the project's original name.
 
 ## Try it
 
-1. **Download** the ZIP for your app from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest):
+1. **Download** the ZIP for your app from the [latest release](https://github.com/hashir107/reloop/releases/latest):
    - **Claude** (claude.ai, desktop or mobile app): `photo-to-listing-skill-v0.4.2.zip`. Turn on code execution under **Settings → Capabilities**. Then go to **Customize → Skills**, click **+**, choose **Upload a skill** and pick the ZIP without unzipping it. [Details](#claude-and-claude-code)
    - **ChatGPT desktop app or Codex:** copy the `reloop` folder into `~/.agents/skills/` ([details](#codex-and-the-chatgpt-desktop-app)), or let your coding agent do it ([agent install](#quick-install-with-a-coding-agent-codex-chatgpt-desktop-app-claude-code)).
    - **Claude Code:** copy the `reloop` folder into `~/.claude/skills/`, or use the agent install. [Details](#claude-and-claude-code)
@@ -65,7 +67,7 @@ LICENSE                     MIT license
 
 If you use an agent such as Codex, you can paste it this prompt:
 
-> Install the ReLoop skill from https://github.com/hashir107/photo-to-listing by following the README section "Quick install with a coding agent".
+> Install the ReLoop skill from https://github.com/hashir107/reloop by following the README section "Quick install with a coding agent".
 
 #### Instructions for the agent
 
@@ -94,7 +96,7 @@ Run this script. Set `DEST` to the skills directory from the table; it defaults 
 ```bash
 set -euo pipefail
 DEST="${DEST:-$HOME/.agents/skills}"
-REPO="hashir107/photo-to-listing"
+REPO="hashir107/reloop"
 TMP="$(mktemp -d)"
 # Public repository: plain HTTPS first, then the GitHub CLI, then SSH (no interactive prompts).
 if GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet "https://github.com/$REPO.git" "$TMP/src" 2>/dev/null; then :
@@ -123,7 +125,7 @@ Then tell the user to **restart** the app or CLI. The skill is invoked with `$re
 
 Each package is built from `skills/reloop/`. You can get them in any of three ways:
 
-- **Releases (easiest):** download the ZIPs from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest). No login is needed. `SHA256SUMS.txt` on the same page lets you check the downloads.
+- **Releases (easiest):** download the ZIPs from the [latest release](https://github.com/hashir107/reloop/releases/latest). No login is needed. `SHA256SUMS.txt` on the same page lets you check the downloads.
 - **Build them locally** with `python3 scripts/build_releases.py`. The ZIPs appear in `dist/`.
 - **From a CI run:** open the repository's **Actions** tab, open the latest **validate** run, and download the **photo-to-listing-packages** artifact. That artifact is itself a ZIP: unzip it once to get the three package ZIPs, and never upload the outer artifact ZIP.
 
@@ -301,7 +303,7 @@ The build is reproducible: identical sources give byte-identical ZIPs. The workf
 
 ## Feedback
 
-Testers' feedback is the most useful input at this stage: so far ReLoop has only been tested on synthetic images. Please [open an issue](https://github.com/hashir107/photo-to-listing/issues/new) (you need a free GitHub account) and include:
+Testers' feedback is the most useful input at this stage: so far ReLoop has only been tested on synthetic images. Please [open an issue](https://github.com/hashir107/reloop/issues/new) (you need a free GitHub account) and include:
 
 - the app and model you used (for example "Claude desktop, Opus" or "ChatGPT desktop"),
 - what you sent: the item and your one-line note,
