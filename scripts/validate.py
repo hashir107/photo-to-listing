@@ -46,6 +46,8 @@ LISTING_FORBIDDEN = [
     (re.compile(r"https?://", re.I), "URL"),
 ]
 
+LICENSE_SPDX = "MIT"
+LICENSE_IN_SKILL = "LICENSE.txt"
 OS_METADATA_NAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
 
 PLACEHOLDERS = {"unknown", "unbekannt", "n/a", "na", "none", "null", "-", "?", "tbd"}
@@ -184,6 +186,8 @@ def check_skill_dir(skill_dir, expected_version=None):
         rel = path.relative_to(skill_dir).as_posix()
         if path.is_symlink():
             problems.append(f"{rel}: symlinks are not allowed in the skill")
+        if rel == LICENSE_IN_SKILL and LICENSE_IN_SKILL in str(meta.get("license", "")):
+            continue  # referenced from the frontmatter `license` field, as the spec allows
         if rel != "SKILL.md" and not rel.startswith("references/") and rel not in referenced:
             problems.append(f"{rel}: bundled file is not referenced from SKILL.md")
     return problems
@@ -500,6 +504,24 @@ def check_packaging():
     for rel in ("packaging/claude-code/INSTALL.md", "packaging/codex/INSTALL.md"):
         if not (ROOT / rel).is_file():
             problems.append(f"{rel}: missing")
+    problems.extend(check_license(cc_plugin, cx_plugin))
+    return problems
+
+
+def check_license(*manifests):
+    """Root LICENSE, the copy bundled with the skill, and the manifests must agree."""
+    problems = []
+    root, bundled = ROOT / "LICENSE", SKILL_DIR / LICENSE_IN_SKILL
+    if not root.is_file() or not bundled.is_file():
+        return [f"LICENSE and skills/{SKILL_NAME}/{LICENSE_IN_SKILL} must both exist"]
+    text = root.read_text(encoding="utf-8")
+    if bundled.read_text(encoding="utf-8") != text:
+        problems.append(f"skills/{SKILL_NAME}/{LICENSE_IN_SKILL} must be identical to LICENSE")
+    if not text.startswith("MIT License\n") or "Copyright (c)" not in text:
+        problems.append("LICENSE must be the MIT License with a copyright line")
+    for manifest in manifests:
+        if manifest and manifest.get("license") != LICENSE_SPDX:
+            problems.append(f"plugin manifest {manifest.get('name')!r}: license must be {LICENSE_SPDX!r}")
     return problems
 
 

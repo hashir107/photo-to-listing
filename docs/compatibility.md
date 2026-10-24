@@ -21,15 +21,15 @@
 
 | Target | Package | Format used | Notes |
 | --- | --- | --- | --- |
-| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.0.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
-| Claude Code | `photo-to-listing-claude-code-v0.4.0.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
-| Codex | `photo-to-listing-codex-v0.4.0.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
+| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.1.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
+| Claude Code | `photo-to-listing-claude-code-v0.4.1.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
+| Codex | `photo-to-listing-codex-v0.4.1.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
 
 All three contain byte-identical copies of `skills/reloop/`, and `scripts/build_releases.py` verifies this.
 
 **Skill name.** The requested name "ReLoop" contains uppercase letters, which the Agent Skills spec does not allow in `name`. The skill ID is therefore `reloop`. "ReLoop" is used as the display name in Claude Code (`displayName`), in Codex (`interface.displayName`) and in `metadata.display-name`.
 
-**Publisher metadata.** `author`/`owner` are set to the GitHub account `hashir107`, which is the destination you specified. No email, license, privacy-policy or terms URLs are set, because none were provided.
+**Publisher metadata.** `author`/`owner` are set to the GitHub account `hashir107`, which is the destination you specified. The license is MIT (`LICENSE`, bundled as `skills/reloop/LICENSE.txt`, `"license": "MIT"` in both manifests). No email, privacy-policy or terms URLs are set, because none were provided.
 
 ## Host differences
 
@@ -49,7 +49,7 @@ The installation and image rows below were run on v0.1.0. For v0.2.0 to v0.4.0, 
 
 | Check | Environment | Result |
 | --- | --- | --- |
-| `scripts/validate.py`, unit tests (46 in v0.1.0, 52 in v0.2.0, 59 in v0.3.0, 63 in v0.4.0), reproducible build | macOS 26 (Darwin 25.6.0), Python 3.14.8 | Pass |
+| `scripts/validate.py`, unit tests (46 in v0.1.0, 52 in v0.2.0, 59 in v0.3.0, 63 in v0.4.0, 66 in v0.4.1), reproducible build | macOS 26 (Darwin 25.6.0), Python 3.14.8 | Pass |
 | Same, in CI | GitHub Actions `ubuntu-latest`, Python 3.12 | See the workflow runs on the repository |
 | `skills-ref validate` on source, Claude ZIP and Codex package skill | skills-ref 0.1.0 (commit `69ef37e`) | `Valid skill` ×3 |
 | Schema meta-validation and examples | jsonschema 4.26.0 (Draft 2020-12) | Pass |

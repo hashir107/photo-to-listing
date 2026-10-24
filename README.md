@@ -9,7 +9,7 @@
 
 You can answer the questions over later turns. The result is updated in place, and confirmed facts and corrections are kept.
 
-> Version 0.4.0. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
+> Version 0.4.1. The skill ID is `reloop`, because the spec requires lowercase names. Its display name is "ReLoop".
 
 ## What it does and does not do
 
@@ -35,9 +35,10 @@ Kleinanzeigen is the target writing style, not an integration. There is no backe
 ```
 skills/reloop/              The one authoritative skill (shipped in every package)
   SKILL.md                  Activation description and workflow
+  LICENSE.txt               MIT license (identical copy of LICENSE)
   schema.json               JSON Schema 2020-12, schema_version 0.4.0
-  references/               Extraction rules; listing-copy rules
-  examples/cases.json       9 worked examples / behavioural fixtures
+  references/               Extraction rules; listing-copy rules; pricing (opt-in)
+  examples/cases.json       11 worked examples / behavioural fixtures
 packaging/claude-code/      Claude Code plugin + marketplace manifests, install notes
 packaging/codex/            Codex (Agent Plugins) manifest + marketplace, install notes
 scripts/validate.py         All source checks (stdlib only)
@@ -46,6 +47,7 @@ scripts/minischema.py       Stdlib JSON Schema subset validator
 tests/                      Unit tests; tests/image-eval/ synthetic SVG test images
 docs/compatibility.md       Official sources, verification date, install results
 docs/evaluation.md          What has and has not been tested, and how
+LICENSE                     MIT license
 ```
 
 ## Install
@@ -63,6 +65,7 @@ The skill is the **whole folder** `skills/reloop/` in this repository:
 ```
 skills/reloop/
 ├── SKILL.md                     # instructions (frontmatter name: reloop)
+├── LICENSE.txt                  # MIT license
 ├── schema.json                  # JSON Schema for the metadata output
 ├── references/                  # extraction-rules.md, kleinanzeigen-copy.md, pricing.md
 └── examples/cases.json          # worked examples
@@ -90,7 +93,7 @@ cp -R "$TMP/src/skills/reloop" "$DEST/reloop"
 rm -rf "$TMP"
 # Verify
 grep -qx 'name: reloop' "$DEST/reloop/SKILL.md"
-for f in schema.json references/extraction-rules.md references/kleinanzeigen-copy.md references/pricing.md examples/cases.json; do
+for f in LICENSE.txt schema.json references/extraction-rules.md references/kleinanzeigen-copy.md references/pricing.md examples/cases.json; do
   test -f "$DEST/reloop/$f" || { echo "missing $f"; exit 1; }
 done
 echo "ReLoop installed at $DEST/reloop"
@@ -107,8 +110,8 @@ Each package is built from `skills/reloop/`. You can get them in either of two w
 
 | You use | Package |
 | --- | --- |
-| Claude apps (claude.ai, desktop, mobile) and Claude Code | `photo-to-listing-skill-v0.4.0.zip`. Claude Code can also use the `skills/reloop` folder or `photo-to-listing-claude-code-v0.4.0.zip` |
-| Codex or the ChatGPT desktop app | `photo-to-listing-codex-v0.4.0.zip`, or the `skills/reloop` folder from this repository |
+| Claude apps (claude.ai, desktop, mobile) and Claude Code | `photo-to-listing-skill-v0.4.1.zip`. Claude Code can also use the `skills/reloop` folder or `photo-to-listing-claude-code-v0.4.1.zip` |
+| Codex or the ChatGPT desktop app | `photo-to-listing-codex-v0.4.1.zip`, or the `skills/reloop` folder from this repository |
 
 ### Claude and Claude Code
 
@@ -117,7 +120,7 @@ Each package is built from `skills/reloop/`. You can get them in either of two w
 1. **Turn on code execution**, which skills need.
    - Free, Pro or Max: **Settings → Capabilities**, then turn on **Code execution and file creation**.
    - Team or Enterprise: an admin enables it under **Organization settings → Plugins & skills**.
-2. **Upload the skill.** Go to **Customize → Skills**, click **+**, then **+ Create skill → Upload a skill**. Choose `photo-to-listing-skill-v0.4.0.zip`. Upload the ZIP as it is; don't unzip it. Its top-level folder is `reloop/`, which is what Claude expects.
+2. **Upload the skill.** Go to **Customize → Skills**, click **+**, then **+ Create skill → Upload a skill**. Choose `photo-to-listing-skill-v0.4.1.zip`. Upload the ZIP as it is; don't unzip it. Its top-level folder is `reloop/`, which is what Claude expects.
 3. **Switch it on.** Make sure **reloop** is enabled in the skills list.
 4. **Use it.** Start a new chat, attach your photos, add a short note and ask for a listing, for example *"24 LG monitors, office closing. Draft a Kleinanzeigen listing."* If it doesn't kick in, add *"Use the ReLoop skill."*
 
@@ -136,14 +139,14 @@ cp -R skills/reloop ~/.claude/skills/reloop
 
 Run this from a clone of this repository, or use the agent script above with `DEST=~/.claude/skills`. To make it available in one project only, copy the folder to `<project>/.claude/skills/reloop` instead. Start a new Claude Code session, then type `/reloop`, or ask for a Kleinanzeigen listing and give it your photos: paste or drag them in, or give their file paths.
 
-**Option C: Claude Code as a plugin.** Unzip `photo-to-listing-claude-code-v0.4.0.zip`, then:
+**Option C: Claude Code as a plugin.** Unzip `photo-to-listing-claude-code-v0.4.1.zip`, then:
 
 ```bash
-claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.0
+claude plugin marketplace add ./photo-to-listing-claude-code-v0.4.1
 claude plugin install photo-to-listing@photo-to-listing-local
 ```
 
-With the plugin, the skill is invoked as `/photo-to-listing:reloop`. To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.0/plugins/photo-to-listing`. The package's `INSTALL.md` has details.
+With the plugin, the skill is invoked as `/photo-to-listing:reloop`. To try it without installing: `claude --plugin-dir ./photo-to-listing-claude-code-v0.4.1/plugins/photo-to-listing`. The package's `INSTALL.md` has details.
 
 Use only one of these in Claude Code (account sync, the skill folder, or the plugin). Otherwise ReLoop may be listed more than once.
 
@@ -161,7 +164,7 @@ Use only one of these in Claude Code (account sync, the skill folder, or the plu
    Or from the unzipped Codex package:
 
    ```bash
-   cp -R photo-to-listing-codex-v0.4.0/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
+   cp -R photo-to-listing-codex-v0.4.1/plugins/photo-to-listing/skills/reloop ~/.agents/skills/reloop
    ```
 
    To make it available in one repository only, copy it to `<repo>/.agents/skills/reloop` instead.
@@ -174,10 +177,10 @@ Use only one of these in Claude Code (account sync, the skill folder, or the plu
 
 Standalone skills are not available on chatgpt.com or in the ChatGPT phone app. Only skills bundled in plugins from the Plugins Directory reach those.
 
-**Option B: install as a plugin.** Unzip `photo-to-listing-codex-v0.4.0.zip`, then register its local marketplace (this needs the Codex CLI):
+**Option B: install as a plugin.** Unzip `photo-to-listing-codex-v0.4.1.zip`, then register its local marketplace (this needs the Codex CLI):
 
 ```bash
-codex plugin marketplace add ./photo-to-listing-codex-v0.4.0
+codex plugin marketplace add ./photo-to-listing-codex-v0.4.1
 ```
 
 Then install **ReLoop** from **Plugins → photo-to-listing (local)** in the ChatGPT desktop app. The package's `INSTALL.md` has details. This route hasn't been tested yet; see [compatibility](docs/compatibility.md).
@@ -254,7 +257,7 @@ Requires Python 3.9 or later and nothing else.
 
 ```bash
 python3 scripts/validate.py                    # SKILL.md, schema, examples, packaging, version, secrets
-python3 -m unittest discover -s tests          # 63 unit tests including negative cases
+python3 -m unittest discover -s tests          # 66 unit tests including negative cases
 python3 scripts/build_releases.py              # validate, build dist/*.zip + SHA256SUMS.txt, verify archives
 python3 scripts/validate.py --dist dist        # re-verify existing archives
 python3 scripts/validate.py --output out.json  # check one real model answer against schema and rules
@@ -265,7 +268,7 @@ Optional cross-checks, also run in CI:
 ```bash
 pip install jsonschema "skills-ref @ git+https://github.com/agentskills/agentskills.git#subdirectory=skills-ref"
 python3 scripts/validate.py --external
-claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.4.0   # if Claude Code is installed
+claude plugin validate dist-unzipped/photo-to-listing-claude-code-v0.4.1   # if Claude Code is installed
 ```
 
 The build is reproducible: identical sources give byte-identical ZIPs. The workflow in `.github/workflows/validate.yml` validates, tests, builds and uploads the packages as workflow artifacts. It never publishes a release.
@@ -276,4 +279,7 @@ The build is reproducible: identical sources give byte-identical ZIPs. The workf
 - Different hosts and models may follow the skill differently. Behaviour is not guaranteed to be identical across Claude, Claude Code and Codex.
 - Codex plugin installation was not tested in this environment; see [docs/compatibility.md](docs/compatibility.md).
 - Category suggestions are human-readable paths, not official Kleinanzeigen category IDs.
-- No license has been chosen yet, so all rights are reserved by default until the owner adds one.
+
+## License
+
+MIT © 2026 Hashir Rizwan. See [LICENSE](LICENSE).

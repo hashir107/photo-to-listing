@@ -352,6 +352,28 @@ class FrontmatterParser(unittest.TestCase):
         token = "ghp_" + "A1b2C3d4" * 5
         self.assertTrue(any(p.search(token) for p, _ in validate.SECRET_PATTERNS))
 
+    def test_license_file_needs_frontmatter_reference(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = self.write_skill(tmp, "x", "name: x\ndescription: Does things.")
+            (skill / "LICENSE.txt").write_text("MIT License\n", encoding="utf-8")
+            self.assertTrue(any("LICENSE.txt: bundled file is not referenced" in p
+                                for p in validate.check_skill_dir(skill)))
+            (skill / "SKILL.md").write_text(
+                "---\nname: x\ndescription: Does things.\nlicense: MIT (see LICENSE.txt)\n---\n\n# Body\n",
+                encoding="utf-8")
+            self.assertEqual(validate.check_skill_dir(skill), [])
+
+
+class LicenseChecks(unittest.TestCase):
+    def test_repo_license_is_consistent(self):
+        manifests = [json.loads((ROOT / p).read_text(encoding="utf-8"))
+                     for p in ("packaging/claude-code/plugin.json", "packaging/codex/plugin.json")]
+        self.assertEqual(validate.check_license(*manifests), [])
+        self.assertIn("Copyright (c) 2026 Hashir Rizwan", (ROOT / "LICENSE").read_text(encoding="utf-8"))
+
+    def test_manifest_license_mismatch_detected(self):
+        self.assertTrue(validate.check_license({"name": "photo-to-listing", "license": "Apache-2.0"}))
+
 
 if __name__ == "__main__":
     unittest.main()

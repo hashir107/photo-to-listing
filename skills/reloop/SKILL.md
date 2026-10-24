@@ -1,10 +1,11 @@
 ---
 name: reloop
 description: ReLoop turns photos of a second-hand item or bundle, plus an optional one-line note, into structured resale metadata, a German Kleinanzeigen listing with an English version and, if the user wants one, a sourced price suggestion, then refines the result as the user answers short follow-up questions. Use when the user asks to identify an object from photos, extract product details from photos or labels, turn photos and a short note into resale or re-commerce metadata, draft a Kleinanzeigen listing from supplied images, or suggest a resale price for a photographed item. Do not use for general image descriptions or general marketplace advice.
+license: MIT (see LICENSE.txt)
 compatibility: Requires a host that can view user-supplied images. No API keys or external services are needed; web search is optional and only used with the user's go-ahead for price suggestions.
 metadata:
   display-name: ReLoop
-  version: "0.4.0"
+  version: "0.4.1"
   project: photo-to-listing
 ---
 

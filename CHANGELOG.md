@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-10-24
+
+### Added
+- MIT license (Copyright (c) 2026 Hashir Rizwan). It consists of `LICENSE` at the repo root, plus a
+  validator-enforced identical copy, `skills/reloop/LICENSE.txt`, so that every package and folder install
+  carries the license text. `SKILL.md` declares `license: MIT (see LICENSE.txt)`, and both
+  plugin manifests declare `"license": "MIT"`.
+- README: agent-ready install section and merged Claude / Claude Code install instructions.
+
 ## [0.4.0] - 2026-10-23
 
 ### Changed

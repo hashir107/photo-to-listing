@@ -7,5 +7,13 @@
     "url": "https://github.com/hashir107"
   },
   "repository": "https://github.com/hashir107/photo-to-listing",
-  "keywords": ["resale", "listing", "kleinanzeigen", "photos", "metadata", "re-commerce"]
+  "license": "MIT",
+  "keywords": [
+    "resale",
+    "listing",
+    "kleinanzeigen",
+    "photos",
+    "metadata",
+    "re-commerce"
+  ]
 }
