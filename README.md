@@ -50,6 +50,54 @@ docs/evaluation.md          What has and has not been tested, and how
 
 ## Install
 
+### Quick install with a coding agent (Codex, ChatGPT desktop app, Claude Code)
+
+If you use an agent such as Codex, you can paste it this prompt:
+
+> Install the ReLoop skill from https://github.com/hashir107/photo-to-listing by following the README section "Quick install with a coding agent".
+
+#### Instructions for the agent
+
+The skill is the **whole folder** `skills/reloop/` in this repository:
+
+```
+skills/reloop/
+├── SKILL.md                     # instructions (frontmatter name: reloop)
+├── schema.json                  # JSON Schema for the metadata output
+├── references/                  # extraction-rules.md, kleinanzeigen-copy.md, pricing.md
+└── examples/cases.json          # worked examples
+```
+
+Copy all of it. `SKILL.md` on its own is not enough, because it reads the files next to it. Install it as a folder named exactly `reloop` in the skills directory for the user's tool:
+
+| Tool | Skills directory |
+| --- | --- |
+| Codex CLI, Codex IDE extension, ChatGPT desktop app | `~/.agents/skills` (or `<repo>/.agents/skills` for one repository only) |
+| Claude Code | `~/.claude/skills` (or `<repo>/.claude/skills` for one repository only) |
+
+Run this script. Set `DEST` to the skills directory from the table; it defaults to `~/.agents/skills`. It is safe to re-run, and re-running updates to the latest version. It only touches `$DEST/reloop` and a temporary folder.
+
+```bash
+set -euo pipefail
+DEST="${DEST:-$HOME/.agents/skills}"
+TMP="$(mktemp -d)"
+# The repository is private: use an account with access (gh auth login, or an SSH key).
+gh repo clone hashir107/photo-to-listing "$TMP/src" -- --depth 1 \
+  || git clone --depth 1 git@github.com:hashir107/photo-to-listing.git "$TMP/src"
+mkdir -p "$DEST"
+rm -rf "$DEST/reloop"
+cp -R "$TMP/src/skills/reloop" "$DEST/reloop"
+rm -rf "$TMP"
+# Verify
+grep -qx 'name: reloop' "$DEST/reloop/SKILL.md"
+for f in schema.json references/extraction-rules.md references/kleinanzeigen-copy.md references/pricing.md examples/cases.json; do
+  test -f "$DEST/reloop/$f" || { echo "missing $f"; exit 1; }
+done
+echo "ReLoop installed at $DEST/reloop"
+```
+
+Then tell the user to **restart** the app or CLI. The skill is invoked with `$reloop` or `/skills` in Codex, `@reloop` in the ChatGPT desktop app, and `/reloop` in Claude Code, or it activates when they ask for a Kleinanzeigen listing from photos. Do not edit the skill files, install plugins, or change any other configuration as part of this install.
+
 ### Get the packages
 
 Each package is built from `skills/reloop/`. You can get them in either of two ways:
