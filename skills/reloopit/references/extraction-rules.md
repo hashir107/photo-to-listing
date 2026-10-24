@@ -1,6 +1,6 @@
 # Extraction rules
 
-These rules govern what ReLoop may state and how it records it. `schema.json` defines the JSON shape. This file defines what the values mean.
+These rules govern what ReLoopIt may state and how it records it. `schema.json` defines the JSON shape. This file defines what the values mean.
 
 ## 1. Sources of truth
 
@@ -104,7 +104,7 @@ Photos show only what is visible. "No visible scratches" applies only to the pho
 
 ## 7. Web research (optional)
 
-ReLoop must work without browsing. Browse only if the user asks, if a material identification question cannot otherwise be settled, or to look up a current new price for the price suggestion (`references/pricing.md`), and only when the host offers browsing.
+ReLoopIt must work without browsing. Browse only if the user asks, if a material identification question cannot otherwise be settled, or to look up a current new price for the price suggestion (`references/pricing.md`), and only when the host offers browsing.
 
 - Search with readable brand and model text and specific visible features, never with the photos themselves. Do not upload user photos to image-search or other third-party services without explicit permission.
 - Prefer the manufacturer's documentation for specifications.

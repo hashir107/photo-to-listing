@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the photo-to-listing repository: skill format, schema, examples,
+"""Validate the reloopit repository: skill format, schema, examples,
 packaging configuration, version consistency and private-file hygiene.
 
 Usage:
@@ -24,8 +24,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import minischema  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILL_NAME = "reloop"
-PLUGIN_NAME = "photo-to-listing"
+SKILL_NAME = "reloopit"
+PLUGIN_NAME = "reloopit"
 SKILL_DIR = ROOT / "skills" / SKILL_NAME
 DIALECT = "https://json-schema.org/draft/2020-12/schema"
 
@@ -35,7 +35,7 @@ SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 # Bundled resource references inside skill Markdown: `references/x.md`, (examples/y.json), schema.json
 RESOURCE_REF_RE = re.compile(r"(?<![\w/.-])((?:references|examples|scripts|assets|agents)/[\w./-]+|schema\.json)")
 
-# Listing-copy policy: things ReLoop must never add on its own.
+# Listing-copy policy: things ReLoopIt must never add on its own.
 LISTING_FORBIDDEN = [
     (re.compile(r"€|\bEUR\b|\bVB\b|Festpreis|\bPreis\b|\bprice\b", re.I), "price or negotiation term"),
     (re.compile(r"Garantie|Gewährleistung|warranty|guarantee", re.I), "warranty claim"),
@@ -47,7 +47,7 @@ LISTING_FORBIDDEN = [
 ]
 
 LICENSE_SPDX = "MIT"
-# The only images allowed anywhere: the ReLoop logo files in the skill's assets/ folder.
+# The only images allowed anywhere: the ReLoopIt logo files in the skill's assets/ folder.
 LOGO_FILES = {"logo.png", "icon-small.png"}
 
 

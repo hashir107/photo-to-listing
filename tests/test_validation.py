@@ -324,12 +324,12 @@ class FrontmatterParser(unittest.TestCase):
 
     def test_uppercase_name_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
-            skill = self.write_skill(tmp, "ReLoop", "name: ReLoop\ndescription: Does things.")
+            skill = self.write_skill(tmp, "ReLoopIt", "name: ReLoopIt\ndescription: Does things.")
             self.assertTrue(any("violates the spec" in p for p in validate.check_skill_dir(skill)))
 
     def test_name_must_match_directory(self):
         with tempfile.TemporaryDirectory() as tmp:
-            skill = self.write_skill(tmp, "other", "name: reloop\ndescription: Does things.")
+            skill = self.write_skill(tmp, "other", "name: reloopit\ndescription: Does things.")
             self.assertTrue(any("must match directory" in p for p in validate.check_skill_dir(skill)))
 
     def test_unquoted_colon_rejected(self):
@@ -366,9 +366,9 @@ class FrontmatterParser(unittest.TestCase):
 
 class LogoChecks(unittest.TestCase):
     def test_only_logo_images_allowed(self):
-        self.assertTrue(validate.is_logo_file("skills/reloop/assets/logo.png"))
-        self.assertTrue(validate.is_logo_file("photo-to-listing-codex-v1/plugins/photo-to-listing/assets/icon-small.png"))
-        self.assertFalse(validate.is_logo_file("skills/reloop/assets/photo_of_my_desk.png"))
+        self.assertTrue(validate.is_logo_file("skills/reloopit/assets/logo.png"))
+        self.assertTrue(validate.is_logo_file("reloopit-codex-v1/plugins/reloopit/assets/icon-small.png"))
+        self.assertFalse(validate.is_logo_file("skills/reloopit/assets/photo_of_my_desk.png"))
         self.assertFalse(validate.is_logo_file("logo.png"))
 
     def test_openai_yaml_icon_must_exist(self):
@@ -390,7 +390,7 @@ class LicenseChecks(unittest.TestCase):
         self.assertIn("Copyright (c) 2026 Hashir Rizwan", (ROOT / "LICENSE").read_text(encoding="utf-8"))
 
     def test_manifest_license_mismatch_detected(self):
-        self.assertTrue(validate.check_license({"name": "photo-to-listing", "license": "Apache-2.0"}))
+        self.assertTrue(validate.check_license({"name": "reloopit", "license": "Apache-2.0"}))
 
 
 if __name__ == "__main__":

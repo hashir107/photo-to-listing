@@ -1,12 +1,12 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  "name": "photo-to-listing",
-  "description": "ReLoop: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy with an optional price suggestion, refined through short follow-up questions.",
+  "name": "reloopit",
+  "description": "ReLoopIt: turn item photos and an optional note into resale metadata and German/English Kleinanzeigen-style listing copy with an optional price suggestion, refined through short follow-up questions.",
   "author": {
     "name": "hashir107",
     "url": "https://github.com/hashir107"
   },
-  "repository": "https://github.com/hashir107/reloop",
+  "repository": "https://github.com/hashir107/reloopit",
   "license": "MIT",
   "keywords": [
     "resale",
@@ -19,13 +19,13 @@
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "ReLoop",
-        "shortDescription": "Photos to resale metadata and listing copy",
-        "longDescription": "Attach photos of an item and an optional one-line note. ReLoop returns an item summary, a Kleinanzeigen form table with German and English copy, an optional price suggestion with its basis, a few targeted questions and schema-valid JSON metadata, and refines the result as you answer.",
+        "displayName": "ReLoopIt",
+        "shortDescription": "Snap it, List it, ReLoopIt.",
+        "longDescription": "Attach photos of an item and an optional one-line note. ReLoopIt returns an item summary, a Kleinanzeigen form table with German and English copy, an optional price suggestion with its basis, a few targeted questions and schema-valid JSON metadata, and refines the result as you answer.",
         "developerName": "hashir107",
         "category": "Productivity",
         "defaultPrompt": [
-          "Use ReLoop to turn these photos into a Kleinanzeigen listing."
+          "Use ReLoopIt to turn these photos into a Kleinanzeigen listing."
         ],
         "brandColor": "#183F48",
         "composerIcon": "./assets/icon-small.png",

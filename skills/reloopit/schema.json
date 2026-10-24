@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:photo-to-listing:reloop:listing-metadata:0.4.0",
-  "title": "ReLoop listing metadata",
+  "$id": "urn:reloopit:listing-metadata:0.4.0",
+  "title": "ReLoopIt listing metadata",
   "description": "Structured re-commerce metadata and Kleinanzeigen-style listing copy derived from user-supplied photos and notes. Unknown scalar values are null. For the assessable lists (visible_defects, included_accessories, missing_accessories), null means not assessed and [] means assessed with nothing found or confirmed. See references/extraction-rules.md.",
   "type": "object",
   "additionalProperties": false,

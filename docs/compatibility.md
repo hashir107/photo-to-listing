@@ -21,15 +21,17 @@
 
 | Target | Package | Format used | Notes |
 | --- | --- | --- | --- |
-| Claude (claude.ai and desktop) | `photo-to-listing-skill-v0.4.3.zip` | Archive containing `reloop/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
-| Claude Code | `photo-to-listing-claude-code-v0.4.3.zip` | Local marketplace `photo-to-listing-local` → plugin `photo-to-listing` (`.claude-plugin/plugin.json`, `displayName: ReLoop`) → `skills/reloop/` | The plugin is namespaced, so the skill is `/photo-to-listing:reloop`. |
-| Codex | `photo-to-listing-codex-v0.4.3.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloop/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
+| Claude (claude.ai and desktop) | `reloopit-skill-v0.5.0.zip` | Archive containing `reloopit/SKILL.md` and its resources | Anthropic's guide requires the skill folder as the ZIP's top level, with a name matching `name`. |
+| Claude Code | `reloopit-claude-code-v0.5.0.zip` | Local marketplace `reloopit-local` → plugin `reloopit` (`.claude-plugin/plugin.json`, `displayName: ReLoopIt`) → `skills/reloopit/` | The plugin is namespaced, so the skill is `/reloopit:reloopit`. |
+| Codex | `reloopit-codex-v0.5.0.zip` | Local marketplace `.agents/plugins/marketplace.json` → portable Agent Plugins package with root `plugin.json` and `extensions.com.openai.interface` → `skills/reloopit/` | OpenAI recommends the root `plugin.json` for new packages. `.codex-plugin/plugin.json` is a legacy fallback and is not shipped. |
 
-All three contain byte-identical copies of `skills/reloop/`, and `scripts/build_releases.py` verifies this.
+All three contain byte-identical copies of `skills/reloopit/`, and `scripts/build_releases.py` verifies this.
 
-**Skill name.** The requested name "ReLoop" contains uppercase letters, which the Agent Skills spec does not allow in `name`. The skill ID is therefore `reloop`. "ReLoop" is used as the display name in Claude Code (`displayName`), in Codex (`interface.displayName`) and in `metadata.display-name`.
+**Rename (v0.5.0).** Up to v0.4.3 the project was called ReLoop (skill `reloop`, plugin and packages `photo-to-listing`). Test rows below from those versions keep the names that were actually used.
 
-**Publisher metadata.** `author`/`owner` are set to the GitHub account `hashir107`, which is the destination you specified. The license is MIT (`LICENSE`, bundled as `skills/reloop/LICENSE.txt`, `"license": "MIT"` in both manifests). No email, privacy-policy or terms URLs are set, because none were provided.
+**Skill name.** The requested name "ReLoopIt" contains uppercase letters, which the Agent Skills spec does not allow in `name`. The skill ID is therefore `reloopit`. "ReLoopIt" is used as the display name in Claude Code (`displayName`), in Codex (`interface.displayName`) and in `metadata.display-name`.
+
+**Publisher metadata.** `author`/`owner` are set to the GitHub account `hashir107`, which is the destination you specified. The license is MIT (`LICENSE`, bundled as `skills/reloopit/LICENSE.txt`, `"license": "MIT"` in both manifests). No email, privacy-policy or terms URLs are set, because none were provided.
 
 ## Host differences
 
@@ -37,7 +39,7 @@ All three contain byte-identical copies of `skills/reloop/`, and `scripts/build_
 | --- | --- | --- | --- |
 | How photos arrive | Chat attachments | Pasted or dragged images, or file paths the model opens with its Read tool | `-i/--image` flag, pasted into the composer, or Shift-dragged in the app or IDE |
 | Install | Upload the ZIP under Customize > Skills | Plugin marketplace or `--plugin-dir` | Plugins Directory (desktop app) after `codex plugin marketplace add`, or copy into `~/.agents/skills` |
-| Explicit invocation | By asking; the skill loads when the request matches | `/photo-to-listing:reloop` | `$reloop` or `/skills` |
+| Explicit invocation | By asking; the skill loads when the request matches | `/reloopit:reloopit` | `$reloopit` or `/skills` |
 | Requirements | A plan with Skills and code execution enabled, per Anthropic | Plugins supported in current releases | The desktop app is used to install local plugins, per OpenAI |
 | Browsing | Depends on whether web search is enabled | WebSearch/WebFetch tools if allowed | `--search` or the configured web search |
 
@@ -60,7 +62,7 @@ The installation and image rows below were run on v0.1.0. For v0.2.0 to v0.4.0, 
 | Image run that follows the packaged SKILL.md | Claude Code desktop subagent (Claude Opus 5.5), 2 synthetic images | See [evaluation.md](evaluation.md). The skill was loaded by hand, not through plugin activation. |
 | Claude ZIP upload (Customize → Skills) | User's Claude account | **v0.1.0 accepted**: after the user uploaded it, the skill appeared in their account's skill list (observed 2026-10-23). Later versions use the same ZIP layout but have not been uploaded yet. Mobile availability has not been verified. |
 | Skill folder in `~/.agents/skills/reloop` | ChatGPT desktop app (macOS) | **Works, as reported by the user** (2026-10-24, v0.4.0) |
-| Skill folder in `~/.agents/skills/reloop` | Codex CLI / IDE extension | **Not tested.** Codex CLI is not installed on the test machine; this uses the same documented skill location as the ChatGPT desktop app. |
+| Skill folder in `~/.agents/skills/reloopit` | Codex CLI / IDE extension | **Not tested.** Codex CLI is not installed on the test machine; this uses the same documented skill location as the ChatGPT desktop app. |
 | Codex plugin via local marketplace | — | **Not tested.** The manifest is validated against the official Agent Plugins schema only. |
 
 ## Untested assumptions and limitations
@@ -73,7 +75,7 @@ The installation and image rows below were run on v0.1.0. For v0.2.0 to v0.4.0, 
 
 | Where | Shown? | How |
 | --- | --- | --- |
-| GitHub README | Yes | `skills/reloop/assets/logo.png` at the top of the README |
+| GitHub README | Yes | `skills/reloopit/assets/logo.png` at the top of the README |
 | ChatGPT desktop app / Codex, skill-folder install | Expected | `agents/openai.yaml` `icon_small` / `icon_large` (documented fields; not yet verified on screen) |
 | Codex / ChatGPT plugin install | Expected | `extensions.com.openai.interface.composerIcon` and `logo` → `./assets/` in the plugin |
 | Claude Code | No | `plugin.json` `icon` is read only by Anthropic's plugin directory, not by Claude Code itself |

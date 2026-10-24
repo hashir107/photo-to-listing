@@ -28,6 +28,6 @@ Thumbs.db
 *.key
 local-photos/
 
-# ...except the ReLoop logo, the one intended image
-!skills/reloop/assets/logo.png
-!skills/reloop/assets/icon-small.png
+# ...except the ReLoopIt logo, the one intended image
+!skills/reloopit/assets/logo.png
+!skills/reloopit/assets/icon-small.png

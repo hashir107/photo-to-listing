@@ -1,16 +1,16 @@
 # Listing copy (Kleinanzeigen style)
 
-ReLoop writes copy in the style of Kleinanzeigen listings. It does not integrate with Kleinanzeigen and does not publish anything. Write the German version first (`listing_title`, `listing_description`), then an English version with the same content (`listing_translations.en`).
+ReLoopIt writes copy in the style of Kleinanzeigen listings. It does not integrate with Kleinanzeigen and does not publish anything. Write the German version first (`listing_title`, `listing_description`), then an English version with the same content (`listing_translations.en`).
 
 ## Form map
 
 Section B is one table in the order of Kleinanzeigen's "Anzeige aufgeben" form, so the user can copy it field by field. The order and limits below were read from a copy of the form saved on 2026-10-21; re-check them if the form changes. Gebot/Gesuch, Bilder, Ort and Name are left out of the table on purpose: the user handles them directly on the form.
 
-| Row in section B | Form limit | What ReLoop puts there |
+| Row in section B | Form limit | What ReLoopIt puts there |
 | --- | --- | --- |
 | `Titel (n/65)` | max. 65 characters | `listing_title`, with its character count |
 | `Kategorie` | picker; Kleinanzeigen pre-selects one after the title is entered | `suggested_category` as a human-readable suggestion |
-| `Eigenschaften und Versand` | depends on the category; options not verified | Condition and key attributes in ReLoop's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
+| `Eigenschaften und Versand` | depends on the category; options not verified | Condition and key attributes in ReLoopIt's own words, marked "im Formular auswählen". Never claim the form's exact option names. Versand: "selbst festlegen" unless the user stated it |
 | `Beschreibung (n/4000)` | max. 4000 characters | the full `listing_description`, with each line break written as `<br>` inside the cell |
 | `Preis` | price in whole euros; Preistyp (e.g. Festpreis) | depends on `price_status` (opt-in): an offer, "selbst festlegen", or the `price_estimate` range and basis, following `references/pricing.md`. Preistyp: "selbst wählen" |
 | `Title (EN)` | not part of the form | `listing_translations.en.title` |

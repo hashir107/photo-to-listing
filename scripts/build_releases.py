@@ -6,9 +6,9 @@ Usage:
     python3 scripts/build_releases.py --out DIR     # build somewhere else
 
 Outputs (VERSION from the VERSION file):
-    photo-to-listing-skill-v<VERSION>.zip        reloop/ skill folder for Claude custom-skill upload
-    photo-to-listing-codex-v<VERSION>.zip        Codex local marketplace + Agent Plugins package
-    photo-to-listing-claude-code-v<VERSION>.zip  Claude Code local marketplace + plugin
+    reloopit-skill-v<VERSION>.zip        reloopit/ skill folder for Claude custom-skill upload
+    reloopit-codex-v<VERSION>.zip        Codex local marketplace + Agent Plugins package
+    reloopit-claude-code-v<VERSION>.zip  Claude Code local marketplace + plugin
     SHA256SUMS.txt
 
 Archives are reproducible: entries are sorted, timestamps fixed and

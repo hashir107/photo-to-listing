@@ -1,14 +1,14 @@
 {
-  "name": "photo-to-listing-local",
+  "name": "reloopit-local",
   "interface": {
-    "displayName": "photo-to-listing (local)"
+    "displayName": "ReLoopIt (local)"
   },
   "plugins": [
     {
-      "name": "photo-to-listing",
+      "name": "reloopit",
       "source": {
         "source": "local",
-        "path": "./plugins/photo-to-listing"
+        "path": "./plugins/reloopit"
       },
       "policy": {
         "installation": "AVAILABLE",

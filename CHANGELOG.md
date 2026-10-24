@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-10-24
+
+### Changed
+- **Renamed ReLoop → ReLoopIt.** The old name collided with the Reloop DJ-equipment brand and a Reloop AI video tool.
+  It is now one name everywhere: the display name is ReLoopIt, and the skill ID and folder, plugin, marketplace
+  (`reloopit-local`) and download packages (`reloopit-*-v0.5.0.zip`) are all `reloopit`, replacing `reloop` and `photo-to-listing`.
+  Invoke it with `$reloopit`, `@reloopit`, `/reloopit` or `/reloopit:reloopit`. The new tagline is "Snap it, List it, ReLoopIt."
+  The repository moves to `hashir107/reloopit`.
+- **Reinstall needed:** remove the old `reloop` skill or `photo-to-listing` plugin, then install `reloopit`.
+  The README's "Upgrading from ReLoop" section has the steps.
+- Schema `$id` is now `urn:reloopit:listing-metadata:0.4.0`. The data format is unchanged (`schema_version` 0.4.0).
+
 ## [0.4.3] - 2026-10-24
 
 ### Added

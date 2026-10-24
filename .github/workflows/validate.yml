@@ -47,6 +47,6 @@ jobs:
       - name: Upload packages as workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: photo-to-listing-packages
+          name: reloopit-packages
           path: dist/
           if-no-files-found: error

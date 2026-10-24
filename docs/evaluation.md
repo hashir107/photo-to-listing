@@ -5,7 +5,7 @@ There are four kinds of evidence. Only some of them exist yet, and none can stan
 | Kind | What it shows | What it does **not** show | Status |
 | --- | --- | --- | --- |
 | 1. Automated schema and packaging tests | The skill files follow the spec; the schema is valid; every example output is schema-valid and obeys the integrity rules; packages are complete, identical to the source and reproducible | Anything about model behaviour | `scripts/validate.py` and `tests/`, run locally and in CI |
-| 2. Text-based behavioural fixtures | What a correct answer looks like for the edge cases, and machine-checkable properties it must have | Whether a model actually produces that, and anything about image recognition | `skills/reloop/examples/cases.json` (9 cases) |
+| 2. Text-based behavioural fixtures | What a correct answer looks like for the edge cases, and machine-checkable properties it must have | Whether a model actually produces that, and anything about image recognition | `skills/reloopit/examples/cases.json` (11 cases) |
 | 3. Actual image-based evaluation | Real model behaviour on real image input | General recognition accuracy, beyond the images tried | One small run on synthetic images (below) |
 | 4. Manual platform installation tests | That a host accepts and loads the package | Answer quality | Claude Code done; Claude.ai and Codex pending ([compatibility.md](compatibility.md)) |
 

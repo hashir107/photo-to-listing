@@ -1,6 +1,6 @@
 # Price suggestions
 
-ReLoop can suggest a price range for the Kleinanzeigen "Preis" field, but only when the user wants one. A suggestion is only as good as its basis, so every price states where it came from. The user decides the final price and the Preistyp (Festpreis or VB).
+ReLoopIt can suggest a price range for the Kleinanzeigen "Preis" field, but only when the user wants one. A suggestion is only as good as its basis, so every price states where it came from. The user decides the final price and the Preistyp (Festpreis or VB).
 
 ## 0. Opt-in (`price_status`)
 
