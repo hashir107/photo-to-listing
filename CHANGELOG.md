@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- The repository is now public. The README no longer requires a collaborator invite, the agent install script tries a
+  plain HTTPS clone first, and a Contributing section describes the fork → pull request flow.
+- Added `.github/CODEOWNERS`: every change needs the owner's review. `main` is protected by a ruleset that
+  requires a pull request, the owner's approval and the passing **validate** check, and blocks force-pushes and deletion.
+
 ## [0.4.2] - 2026-10-24
 
 ### Added

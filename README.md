@@ -13,13 +13,12 @@ You can answer the questions over later turns. The result is updated in place, a
 
 ## Try it
 
-1. **Get access.** This repository is private for now. You need a GitHub account, and you must accept the collaborator invite, which arrives by email and at [github.com/notifications](https://github.com/notifications). Stay logged in to GitHub for the downloads below.
-2. **Download** the ZIP for your app from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest):
+1. **Download** the ZIP for your app from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest):
    - **Claude** (claude.ai, desktop or mobile app): `photo-to-listing-skill-v0.4.2.zip`. Turn on code execution under **Settings → Capabilities**. Then go to **Customize → Skills**, click **+**, choose **Upload a skill** and pick the ZIP without unzipping it. [Details](#claude-and-claude-code)
    - **ChatGPT desktop app or Codex:** copy the `reloop` folder into `~/.agents/skills/` ([details](#codex-and-the-chatgpt-desktop-app)), or let your coding agent do it ([agent install](#quick-install-with-a-coding-agent-codex-chatgpt-desktop-app-claude-code)).
    - **Claude Code:** copy the `reloop` folder into `~/.claude/skills/`, or use the agent install. [Details](#claude-and-claude-code)
-3. **Use it.** Start a new chat, attach a few photos of the item (include a close-up of any label), add one line such as *"24 LG monitors, office closing"*, and ask for a Kleinanzeigen listing. Answer the follow-up questions if you like. To get a price suggestion, paste a few comparable prices or allow a web search when ReLoop offers it.
-4. **Tell me how it went:** see [Feedback](#feedback).
+2. **Use it.** Start a new chat, attach a few photos of the item (include a close-up of any label), add one line such as *"24 LG monitors, office closing"*, and ask for a Kleinanzeigen listing. Answer the follow-up questions if you like. To get a price suggestion, paste a few comparable prices or allow a web search when ReLoop offers it.
+3. **Tell me how it went:** see [Feedback](#feedback). No GitHub account is needed to download; you need one to open an issue.
 
 ## What it does and does not do
 
@@ -88,7 +87,7 @@ Copy all of it. `SKILL.md` on its own is not enough, because it reads the files 
 | Codex CLI, Codex IDE extension, ChatGPT desktop app | `~/.agents/skills` (or `<repo>/.agents/skills` for one repository only) |
 | Claude Code | `~/.claude/skills` (or `<repo>/.claude/skills` for one repository only) |
 
-**Prerequisite:** the repository is private. The user's GitHub account needs access, which means they have accepted the collaborator invite. The machine also needs a way to authenticate: the GitHub CLI logged in (`gh auth login`), stored HTTPS git credentials, or an SSH key. If none works, stop and tell the user to accept the invite and run `gh auth login`.
+**Prerequisite:** `git`. The repository is public, so no GitHub login is needed. The script falls back to the GitHub CLI or SSH only if a plain HTTPS clone fails, for example behind a proxy.
 
 Run this script. Set `DEST` to the skills directory from the table; it defaults to `~/.agents/skills`. It is safe to re-run, and re-running updates to the latest version. It only touches `$DEST/reloop` and a temporary folder.
 
@@ -97,13 +96,13 @@ set -euo pipefail
 DEST="${DEST:-$HOME/.agents/skills}"
 REPO="hashir107/photo-to-listing"
 TMP="$(mktemp -d)"
-# Private repository: try the GitHub CLI, then HTTPS with stored credentials, then SSH (no interactive prompts).
-if command -v gh >/dev/null 2>&1 && gh repo clone "$REPO" "$TMP/src" -- --depth 1 --quiet 2>/dev/null; then :
-elif GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet "https://github.com/$REPO.git" "$TMP/src" 2>/dev/null; then :
+# Public repository: plain HTTPS first, then the GitHub CLI, then SSH (no interactive prompts).
+if GIT_TERMINAL_PROMPT=0 git clone --depth 1 --quiet "https://github.com/$REPO.git" "$TMP/src" 2>/dev/null; then :
+elif command -v gh >/dev/null 2>&1 && gh repo clone "$REPO" "$TMP/src" -- --depth 1 --quiet 2>/dev/null; then :
 elif GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone --depth 1 --quiet "git@github.com:$REPO.git" "$TMP/src" 2>/dev/null; then :
 else
   rm -rf "$TMP"
-  echo "No access to $REPO: accept the collaborator invite, run 'gh auth login', then retry." >&2
+  echo "Could not download $REPO: check your internet connection, then retry." >&2
   exit 1
 fi
 mkdir -p "$DEST"
@@ -124,7 +123,7 @@ Then tell the user to **restart** the app or CLI. The skill is invoked with `$re
 
 Each package is built from `skills/reloop/`. You can get them in any of three ways:
 
-- **Releases (easiest):** download the ZIPs from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest). The repository is private, so you must be logged in to GitHub with an account that has accepted the collaborator invite. `SHA256SUMS.txt` on the same page lets you check the downloads.
+- **Releases (easiest):** download the ZIPs from the [latest release](https://github.com/hashir107/photo-to-listing/releases/latest). No login is needed. `SHA256SUMS.txt` on the same page lets you check the downloads.
 - **Build them locally** with `python3 scripts/build_releases.py`. The ZIPs appear in `dist/`.
 - **From a CI run:** open the repository's **Actions** tab, open the latest **validate** run, and download the **photo-to-listing-packages** artifact. That artifact is itself a ZIP: unzip it once to get the three package ZIPs, and never upload the outer artifact ZIP.
 
@@ -302,13 +301,23 @@ The build is reproducible: identical sources give byte-identical ZIPs. The workf
 
 ## Feedback
 
-Testers' feedback is the most useful input at this stage: so far ReLoop has only been tested on synthetic images. Please [open an issue](https://github.com/hashir107/photo-to-listing/issues/new) and include:
+Testers' feedback is the most useful input at this stage: so far ReLoop has only been tested on synthetic images. Please [open an issue](https://github.com/hashir107/photo-to-listing/issues/new) (you need a free GitHub account) and include:
 
 - the app and model you used (for example "Claude desktop, Opus" or "ChatGPT desktop"),
 - what you sent: the item and your one-line note,
 - what was wrong or missing, and what you expected.
 
 **Don't attach photos that show personal data**, serial numbers, addresses, documents or people. Describe the photo instead, or crop it first.
+
+## Contributing
+
+Improvements are welcome through pull requests:
+
+1. **Fork** the repository.
+2. **Make your change** on a branch and run `python3 scripts/validate.py` and `python3 -m unittest discover -s tests`.
+3. **Open a pull request** against `main`.
+
+`main` is protected. Changes land only through a pull request that the owner (@hashir107, see `.github/CODEOWNERS`) has reviewed and approved, and the **validate** check must pass. Direct pushes, force-pushes and deleting `main` are blocked.
 
 ## Disclaimer
 
